@@ -62,6 +62,11 @@ import Logout from "layouts/projects/logout";
 import { Navigate } from "react-router-dom";
 import Document from "examples/Icons/Document";
 
+//Imports by Monika
+import LeaveSummary from "layouts/leavetracker/components/leavesummary";
+import InterviewEvaluationForm from "layouts/forms/interviewevaluationform";
+import JobApplicationForm from "layouts/forms/jobapplicationform";
+
 const routesArray = [
   {
     type: "route",
@@ -483,6 +488,35 @@ const routesArray = [
   noCollapse: true,
   permissions: ["viewIdleLogs"],
 },
+{
+        type: "collapse",
+        name: "LeaveTracker",
+        key: "leave-tracker",
+        icon: <Document size="12px" />,
+         route: "/leavetracker/components/leavesummary",
+         component: <LeaveSummary />,
+         noCollapse: true,
+      },
+{
+        type: "collapse",
+        name: "Forms",
+        key: "forms",
+        icon: <Document size="12px" />,
+        collapse: [
+          {
+            name: "Interview Evaluation Form",
+            key: "interview-evaluation-form",
+            route: "/forms/interviewevaluationform",
+            component: <InterviewEvaluationForm />,
+          },
+          {
+            name: "Job Application Form",
+            key: "job-application-form",
+            route: "/forms/jobapplicationform",
+            component: <JobApplicationForm />,
+          },
+        ],
+      },
 /* {
   type: "collapse",
   name: "Logout",
