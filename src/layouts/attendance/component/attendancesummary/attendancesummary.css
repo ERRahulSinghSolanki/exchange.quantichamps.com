@@ -1,0 +1,126 @@
+/* attendance.css */
+
+.attendance-row {
+  display: flex;
+  flex-wrap: wrap; /* 👈 Helps prevent overflow */
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  padding: 16px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.attendance-row:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.day-label {
+  font-weight: bold;
+  width: 60px;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  color: #111;
+}
+
+.timeline-bar {
+  flex-grow: 1;
+  height: 6px;
+  border-radius: 4px;
+  margin: 0 16px;
+  position: relative;
+  background-color: #d0d0d0;
+  min-width: 100px;
+}
+
+.timeline-bar.absent {
+  background-color: #ff4d4f;
+}
+
+.timeline-bar.leave {
+  background-color: #bfbfbf;
+}
+
+.timeline-bar.present {
+  background-color: #52c41a;
+}
+
+.timeline-bar::before,
+.timeline-bar::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #999;
+  position: absolute;
+  top: -3px;
+}
+
+.timeline-bar::before {
+  left: 0;
+}
+
+.timeline-bar::after {
+  right: 0;
+}
+
+.timeline-bar.present::before,
+.timeline-bar.present::after {
+  background-color: #52c41a;
+}
+
+.timeline-bar.absent::before,
+.timeline-bar.absent::after {
+  background-color: #ff4d4f;
+}
+
+.timeline-bar.leave::before,
+.timeline-bar.leave::after {
+  background-color: #bfbfbf;
+}
+
+.time-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: right;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.time-text .in {
+  color: #52c41a;
+}
+
+.time-text .out {
+  color: #ff4d4f;
+}
+.time-scale {
+  margin-left: 300px; /* 👈 Adjust as needed */
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+
+/* 🔧 Prevent overflow on smaller screens */
+@media (max-width: 768px) {
+  .attendance-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .day-label,
+  .time-text {
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .timeline-bar {
+    width: 100%;
+    margin: 8px 0;
+  }
+  
+}

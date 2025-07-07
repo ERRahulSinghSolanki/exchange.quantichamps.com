@@ -1,0 +1,58 @@
+.row-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  
+}
+
+.day-column,
+.checkin-column,
+.checkout-column,
+.hours-column {
+  width: 100px;
+  text-align: center;
+  
+}
+
+.timeline-column {
+  flex: 1;
+  padding: 0 10px;
+}
+
+.timeline-track {
+  display: flex;
+  align-items: center;
+  position: relative;
+  
+}
+
+.timeline-line {
+  flex: 1;
+  height: 2px;
+  background: #f56565; /* red */
+  position: relative;
+  margin: 0 8px;
+}
+
+.status-label {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff0f0;
+  color: #f56565;
+  border: 1px solid #f56565;
+  padding: 1px 6px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #ccc;
+  border-radius: 50%;
+}
