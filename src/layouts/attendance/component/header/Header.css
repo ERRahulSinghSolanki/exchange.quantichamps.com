@@ -1,0 +1,134 @@
+.header-container {
+  width: 100%;
+  max-width: 1170px;
+  margin: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  margin-left: 270px;
+  /* margin-top: 20px; */
+}
+
+.header-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 590px;
+}
+
+.nav-icon {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  /* margin-right: 20px; */
+}
+
+.nav-icon:hover {
+  background: #f0f0f0;
+}
+
+.nav-icon.active {
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.date-range {
+  margin-left: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.date-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+    margin-left: 20px;
+      margin-top: 110px;
+}
+
+.date-button {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  border-radius: 6px;
+  font-size: 14px;
+
+}
+
+.header-body {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.shift-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #555;
+}
+
+.note-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-width: 200px;
+}
+
+.checkin-button {
+  background: #28a745;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.tab-header {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* same as gap={2} in MUI (8px * 2) */
+  margin-bottom: 10px;
+  
+}
+
+.tab-option {
+  font-size: 14px;
+  font-weight: normal;
+  color: #344767;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tab-option.active {
+  font-weight: bold;
+  color: #1a73e8; /* matches "info.main" in MUI theme */
+}
