@@ -26,6 +26,18 @@ import AllBreaks from "layouts/breaks/all";
 import MyAttendance from "layouts/attendance/my";
 import AllAttendance from "layouts/attendance/all";
 
+import EarlyLoginNotifications from "layouts/projects/admin";
+import EarlyLoginManagerNotifications from "layouts/projects/managernotifications";
+import EarlyLoginTeamLeaderNotifications from "layouts/projects/teamleadernotifications";
+import LeaveApprovalTable from "layouts/projects/leave/approve";
+import LeaveApplyForm from "layouts/projects/leave/apply";
+import LeaveHistory from "layouts/projects/leave/history";
+import MyBreaks from "layouts/projects/breaks/my";
+import AllBreaks from "layouts/projects/breaks/all";
+import MyAttendance from "layouts/projects/attendance/my";
+import AllAttendance from "layouts/projects/attendance/all";
+import AttendanceSummary from "./layouts/attendance/component/attendancesummary";
+
 import AddUser from "layouts/users/add";
 import UserList from "layouts/users/list";
 import EditUser from "layouts/users/edit";
@@ -48,6 +60,11 @@ import IdleLogs from "layouts/idel-log";
 
 import { Navigate } from "react-router-dom";
 import Document from "examples/Icons/Document";
+
+//Imports by Monika
+import LeaveSummary from "layouts/leavetracker/components/leavesummary";
+import InterviewEvaluationForm from "layouts/forms/interviewevaluationform";
+import JobApplicationForm from "layouts/forms/jobapplicationform";
 
 const routesArray = [
   {
@@ -128,6 +145,15 @@ const routesArray = [
     component: <Studies />,
     noCollapse: true,
     permissions: ["viewStudies"],
+  },
+   {
+    type: "collapse",
+    name: "Attendance",
+    key: "attendance",
+    route:"/attendance/component/attendancesummary",
+    icon: <Document size="12px" />,
+    component: <AttendanceSummary />,
+    noCollapse: true,
   },
   {
   type: "collapse",
@@ -376,6 +402,35 @@ const routesArray = [
   noCollapse: true,
   permissions: ["viewIdleLogs"],
 },
+{
+        type: "collapse",
+        name: "LeaveTracker",
+        key: "leave-tracker",
+        icon: <Document size="12px" />,
+         route: "/leavetracker/components/leavesummary",
+         component: <LeaveSummary />,
+         noCollapse: true,
+      },
+{
+        type: "collapse",
+        name: "Forms",
+        key: "forms",
+        icon: <Document size="12px" />,
+        collapse: [
+          {
+            name: "Interview Evaluation Form",
+            key: "interview-evaluation-form",
+            route: "/forms/interviewevaluationform",
+            component: <InterviewEvaluationForm />,
+          },
+          {
+            name: "Job Application Form",
+            key: "job-application-form",
+            route: "/forms/jobapplicationform",
+            component: <JobApplicationForm />,
+          },
+        ],
+      },
 
 ];
 
