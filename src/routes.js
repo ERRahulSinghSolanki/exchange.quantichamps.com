@@ -1,4 +1,4 @@
-// ✅ FINAL PERMISSION-BASED routes.js FILE (PART 1 of 3)
+// ✅ FINAL PERMISSION-BASED routes.js 
 
 import Default from "layouts/dashboards/default";
 import NotificationBadgeIcon from "components/Sidebar/NotificationBadgeIcon";
@@ -26,16 +26,6 @@ import AllBreaks from "layouts/breaks/all";
 import MyAttendance from "layouts/attendance/my";
 import AllAttendance from "layouts/attendance/all";
 
-import EarlyLoginNotifications from "layouts/projects/admin";
-import EarlyLoginManagerNotifications from "layouts/projects/managernotifications";
-import EarlyLoginTeamLeaderNotifications from "layouts/projects/teamleadernotifications";
-import LeaveApprovalTable from "layouts/projects/leave/approve";
-import LeaveApplyForm from "layouts/projects/leave/apply";
-import LeaveHistory from "layouts/projects/leave/history";
-import MyBreaks from "layouts/projects/breaks/my";
-import AllBreaks from "layouts/projects/breaks/all";
-import MyAttendance from "layouts/projects/attendance/my";
-import AllAttendance from "layouts/projects/attendance/all";
 import AttendanceSummary from "./layouts/attendance/component/attendancesummary";
 
 import AddUser from "layouts/users/add";
