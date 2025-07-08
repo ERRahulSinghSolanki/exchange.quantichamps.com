@@ -40,7 +40,7 @@ import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 // Auth + Break handling
 import { useAuth } from "AuthContext";
 import useBreakManager from "context/BreakContext";
-import BreakModal from "layouts/projects/break/BreakModal";
+import BreakModal from "layouts/break/BreakModal";
 
 function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
   /* ──────────────────────────────────────

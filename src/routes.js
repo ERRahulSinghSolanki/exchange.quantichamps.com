@@ -15,49 +15,36 @@ import SignUpIllustration from "layouts/authentication/sign-up/illustration";
 import ResetIllustration from "layouts/authentication/reset-password/illustration";
 import Error404 from "layouts/authentication/error/404";
 
-import EarlyLoginNotifications from "layouts/projects/admin";
-import EarlyLoginManagerNotifications from "layouts/projects/managernotifications";
-import EarlyLoginTeamLeaderNotifications from "layouts/projects/teamleadernotifications";
-import LeaveApprovalTable from "layouts/projects/leave/approve";
-import LeaveApplyForm from "layouts/projects/leave/apply";
-import LeaveHistory from "layouts/projects/leave/history";
-import MyBreaks from "layouts/projects/breaks/my";
-import AllBreaks from "layouts/projects/breaks/all";
-import MyAttendance from "layouts/projects/attendance/my";
-import AllAttendance from "layouts/projects/attendance/all";
+import EarlyLoginNotifications from "layouts/admin";
+import EarlyLoginManagerNotifications from "layouts/managernotifications";
+import EarlyLoginTeamLeaderNotifications from "layouts/teamleadernotifications";
+import LeaveApprovalTable from "layouts/leave/approve";
+import LeaveApplyForm from "layouts/leave/apply";
+import LeaveHistory from "layouts/leave/history";
+import MyBreaks from "layouts/breaks/my";
+import AllBreaks from "layouts/breaks/all";
+import MyAttendance from "layouts/attendance/my";
+import AllAttendance from "layouts/attendance/all";
 
-import AddUser from "layouts/projects/users/add";
-import UserList from "layouts/projects/users/list";
-import EditUser from "layouts/projects/users/edit";
-/* 
-import AddTeamLeader from "layouts/projects/teamleader/add";
-import TeamLeaderList from "layouts/projects/teamleader/list";
-import EditTeamLeader from "layouts/projects/teamleader/edit";
+import AddUser from "layouts/users/add";
+import UserList from "layouts/users/list";
+import EditUser from "layouts/users/edit";
 
-import AddManager from "layouts/projects/manager/add";
-import ManagerList from "layouts/projects/manager/list";
-import EditManager from "layouts/projects/manager/edit"; */
+import RolesList   from "layouts/roles/list";
+import AddRole from "layouts/roles/add";
+import RolePermissions from "layouts/roles/view";
 
-import RolesList   from "layouts/projects/roles/list";
-import AddRole from "layouts/projects/roles/add";
-import RolePermissions from "layouts/projects/roles/view";
+import AddBranch from "layouts/branch/add";
+import BranchList from "layouts/branch/list";
+import TrashedBranchList from "layouts/branch/trashed";
+import EditBranch from "layouts/branch/edit";
 
-import AddPermission from "layouts/projects/permissions/add";
-import PermissionsList from "layouts/projects/permissions/list";
-import EditPermission from "layouts/projects/permissions/edit";
+import AddShift from "layouts/shifts/add";
+import ShiftList from "layouts/shifts/list";
+import TrashedShiftList from "layouts/shifts/trashed";
+import EditShift from "layouts/shifts/edit";
 
-import AddBranch from "layouts/projects/branch/add";
-import BranchList from "layouts/projects/branch/list";
-import TrashedBranchList from "layouts/projects/branch/trashed";
-import EditBranch from "layouts/projects/branch/edit";
-
-import AddShift from "layouts/projects/shifts/add";
-import ShiftList from "layouts/projects/shifts/list";
-import TrashedShiftList from "layouts/projects/shifts/trashed";
-import EditShift from "layouts/projects/shifts/edit";
-
-import IdleLogs from "layouts/projects/idel-log";
-import Logout from "layouts/projects/logout";
+import IdleLogs from "layouts/idel-log";
 
 import { Navigate } from "react-router-dom";
 import Document from "examples/Icons/Document";
@@ -147,7 +134,7 @@ const routesArray = [
   name: "Notifications",
   key: "notifications-admin",
   icon: <NotificationBadgeIcon />,
-  route: "/projects/admin",
+  route: "/admin",
   component: <EarlyLoginNotifications />,
   noCollapse: true,
   permissions: ["viewAdminNotifications"],
@@ -157,7 +144,7 @@ const routesArray = [
   name: "Notifications",
   key: "notifications-manager",
   icon: <NotificationManagerBadgeIcon />,
-  route: "/projects/managernotifications",
+  route: "/managernotifications",
   component: <EarlyLoginManagerNotifications />,
   noCollapse: true,
   permissions: ["viewManagerNotifications"],
@@ -167,7 +154,7 @@ const routesArray = [
   name: "Notifications",
   key: "notifications-teamleader",
   icon: <NotificationTeamLeaderBadgeIcon />,
-  route: "/projects/teamleadernotifications",
+  route: "/teamleadernotifications",
   component: <EarlyLoginTeamLeaderNotifications />,
   noCollapse: true,
   permissions: ["viewTeamLeaderNotifications"],
@@ -177,7 +164,7 @@ const routesArray = [
   name: "Leave",
   key: "leave-approvals",
   icon: <NotificationLeaveBadgeIcon />,
-  route: "/projects/leave/approvals",
+  route: "/leave/approvals",
   component: <LeaveApprovalTable />,
   noCollapse: true,
   permissions: ["ApproveLeave"],
@@ -187,7 +174,7 @@ const routesArray = [
   name: "Apply Leave",
   key: "apply-leave",
   icon: <Document size="12px" />,
-  route: "/projects/leave/apply",
+  route: "/leave/apply",
   component: <LeaveApplyForm />,
   noCollapse: true,
   permissions: ["ApplyLeave"],
@@ -197,7 +184,7 @@ const routesArray = [
   name: "My Leave History",
   key: "leave-history",
   icon: <Document size="12px" />,
-  route: "/projects/leave/history",
+  route: "/leave/history",
   component: <LeaveHistory />,
   noCollapse: true,
   permissions: ["viewLeaveHistory"],
@@ -207,7 +194,7 @@ const routesArray = [
   name: "My Breaks",
   key: "my-breaks",
   icon: <Document size="12px" />,
-  route: "/projects/breaks/my",
+  route: "/breaks/my",
   component: <MyBreaks />,
   noCollapse: true,
   permissions: ["viewMyBreaks"],
@@ -217,7 +204,7 @@ const routesArray = [
   name: "All Breaks",
   key: "all-breaks",
   icon: <Document size="12px" />,
-  route: "/projects/breaks/all",
+  route: "/breaks/all",
   component: <AllBreaks />,
   noCollapse: true,
   permissions: ["viewAllBreaks"],
@@ -227,7 +214,7 @@ const routesArray = [
   name: "My Attendance",
   key: "my-attendance",
   icon: <Document size="12px" />,
-  route: "/projects/attendance/my",
+  route: "/attendance/my",
   component: <MyAttendance />,
   noCollapse: true,
   permissions: ["viewMyAttendance"],
@@ -237,7 +224,7 @@ const routesArray = [
   name: "All Attendance",
   key: "all-attendance",
   icon: <Document size="12px" />,
-  route: "/projects/attendance/all",
+  route: "/attendance/all",
   component: <AllAttendance />,
   noCollapse: true,
   permissions: ["viewAllAttendance"],
@@ -251,14 +238,14 @@ const routesArray = [
     {
       name: "New",
       key: "add-user",
-      route: "/projects/users/add",
+      route: "/users/add",
       component: <AddUser />,
       permissions: ["AddUser"],
     },
     {
       name: "List",
       key: "user-list",
-      route: "/projects/users/list",
+      route: "/users/list",
       component: <UserList />,
       permissions: ["viewUser"],
     },
@@ -269,72 +256,10 @@ const routesArray = [
   type: "route",
   name: "Edit User",
   key: "edit-user",
-  route: "/projects/users/edit/:id",
+  route: "/users/edit/:id",
   component: <EditUser />,
   permissions: ["EditUser"],
 },
-/* {
-  type: "collapse",
-  name: "Team Leader",
-  key: "teamleaders",
-  icon: <Document size="12px" />,
-  collapse: [
-    {
-      name: "New",
-      key: "add-teamleader",
-      route: "/projects/teamleader/add",
-      component: <AddTeamLeader />,
-      permissions: ["AddTeamLeader"],
-    },
-    {
-      name: "List",
-      key: "teamleader-list",
-      route: "/projects/teamleader/list",
-      component: <TeamLeaderList />,
-      permissions: ["viewTeamLeader"],
-    },
-  ],
-  permissions: ["TeamLeader"],
-},
-{
-  type: "route",
-  name: "Edit Team Leader",
-  key: "edit-teamleader",
-  route: "/projects/teamleader/edit/:id",
-  component: <EditTeamLeader />,
-  permissions: ["EditTeamLeader"],
-},
-{
-  type: "collapse",
-  name: "Manager",
-  key: "manager",
-  icon: <Document size="12px" />,
-  collapse: [
-    {
-      name: "New",
-      key: "add-manager",
-      route: "/projects/manager/add",
-      component: <AddManager />,
-      permissions: ["AddManager"],
-    },
-    {
-      name: "List",
-      key: "manager-list",
-      route: "/projects/manager/list",
-      component: <ManagerList />,
-      permissions: ["viewManager"],
-    },
-  ],
-  permissions: ["Manager"],
-},
-{
-  type: "route",
-  name: "Edit Manager",
-  key: "edit-manager",
-  route: "/projects/manager/edit/:id",
-  component: <EditManager />,
-  permissions: ["EditManager"],
-}, */
 {
   type: "collapse",
   name: "Roles",
@@ -344,14 +269,14 @@ const routesArray = [
     {
       name: "New",
       key: "add-roles",
-      route: "/projects/roles/add",
+      route: "/roles/add",
       component: <AddRole />,
       permissions: ["AddRoles"],
     },
     {
       name: "List",
       key: "roles-list",
-      route: "/projects/roles/list",
+      route: "/roles/list",
       component: <RolesList />,
       permissions: ["viewRoles"],
     },
@@ -361,42 +286,10 @@ const routesArray = [
   {
         name: "View Permissions",
         key: "view-permissions",
-        route: "/projects/roles/view/:id",
+        route: "/roles/view/:id",
         component: <RolePermissions />,
         permissions: ["viewPermissionByRole"],
   },
-
-/* {
-  type: "collapse",
-  name: "Permissions",
-  key: "permissions",
-  icon: <Document size="12px" />,
-  collapse: [
-    {
-      name: "New",
-      key: "add-permission",
-      route: "/projects/permissions/add",
-      component: <AddPermission />,
-      permissions: ["AddPermission"],
-    },
-    {
-      name: "List",
-      key: "permission-list",
-      route: "/projects/permissions/list",
-      component: <PermissionsList />,
-      permissions: ["viewPermission"],
-    },
-  ],
-  permissions: ["Permission"],
-},
-{
-  type: "route",
-  name: "Edit Permission",
-  key: "edit-permission",
-  route: "/projects/permissions/edit/:id",
-  component: <EditPermission />,
-  permissions: ["EditPermission"],
-}, */
 {
   type: "collapse",
   name: "Branch",
@@ -406,21 +299,21 @@ const routesArray = [
     {
       name: "New",
       key: "add-branch",
-      route: "/projects/branches/add",
+      route: "/branches/add",
       component: <AddBranch />,
       permissions: ["AddBranch"],
     },
     {
       name: "List",
       key: "branch-list",
-      route: "/projects/branches",
+      route: "/branches",
       component: <BranchList />,
       permissions: ["viewBranch"],
     },
     {
       name: "Trashed List",
       key: "trashed-branch-list",
-      route: "/projects/branches/trashed",
+      route: "/branches/trashed",
       component: <TrashedBranchList />,
       permissions: ["viewTrashedBranch"],
     },
@@ -431,7 +324,7 @@ const routesArray = [
   type: "route",
   name: "Edit Branch",
   key: "edit-branch",
-  route: "/projects/branches/edit/:id",
+  route: "/branches/edit/:id",
   component: <EditBranch />,
   permissions: ["EditBranch"],
 },
@@ -444,21 +337,21 @@ const routesArray = [
     {
       name: "New",
       key: "add-shift",
-      route: "/projects/shifts/add",
+      route: "/shifts/add",
       component: <AddShift />,
       permissions: ["AddShift"],
     },
     {
       name: "List",
       key: "shift-list",
-      route: "/projects/shifts",
+      route: "/shifts",
       component: <ShiftList />,
       permissions: ["viewShift"],
     },
     {
       name: "Trashed List",
       key: "trashed-shift-list",
-      route: "/projects/shifts/trashed",
+      route: "/shifts/trashed",
       component: <TrashedShiftList />,
       permissions: ["viewTrashedShift"],
     },
@@ -469,7 +362,7 @@ const routesArray = [
   type: "route",
   name: "Edit Shift",
   key: "edit-shift",
-  route: "/projects/shifts/edit/:id",
+  route: "/shifts/edit/:id",
   component: <EditShift />,
   permissions: ["EditShift"],
 },
@@ -477,21 +370,12 @@ const routesArray = [
   type: "collapse",
   name: "Idle Logs",
   key: "idel-logs",
-  route: "/projects/idel-log",
+  route: "/idel-log",
   icon: <Document size="12px" />,
   component: <IdleLogs />,
   noCollapse: true,
   permissions: ["viewIdleLogs"],
 },
-/* {
-  type: "collapse",
-  name: "Logout",
-  key: "logout",
-  route: "/projects/logout",
-  component: <Logout />,
-  noCollapse: true,
-  permissions: [], // Always visible when logged in
-}, */
 
 ];
 

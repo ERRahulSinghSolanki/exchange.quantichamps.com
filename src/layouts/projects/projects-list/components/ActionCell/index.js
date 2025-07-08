@@ -1,135 +1,120 @@
-import React, { useEffect,useState } from "react"; // Import React and useState
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-
-// prop-types is a library for typechecking of props
-import PropTypes, { object } from "prop-types";
-
-// @mui material components
+import PropTypes from "prop-types";
 import Icon from "@mui/material/Icon";
 import Tooltip from "@mui/material/Tooltip";
-
-// Soft UI Dashboard PRO React components
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Tabs,
+  Tab,
+  CircularProgress
+} from "@mui/material";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftButton from "components/SoftButton";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Tabs, Tab, CircularProgress} from "@mui/material";
 import { API_URL } from "config";
+
 const token = localStorage.getItem("authToken");
 
-
+const renderPrecodedValues = (precodes) => {
+  if (Array.isArray(precodes)) return precodes.join(", ");
+  if (typeof precodes === "object" && precodes !== null) return Object.values(precodes).join(", ");
+  return "";
+};
 
 function ActionCell({ id, quest_code }) {
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [apiResponse, setApiResponse] = useState(null); 
-  const [apiResponseCells, setApiResponseCells] = useState(null); 
-  const [apiResponseQuotas, setApiResponseQuotas] = useState(null); 
+  const [apiResponse, setApiResponse] = useState(null);
+  const [apiResponseQuotas, setApiResponseQuotas] = useState([]);
   const [quotasCount, setQuotasCount] = useState(0);
-  const [tabIndex, setTabIndex] = useState(0); // State for tabs
+  const [tabIndex, setTabIndex] = useState(0);
 
   const navigate = useNavigate();
 
   const handleOpen = async () => {
     setIsModalOpen(true);
     setLoading(true);
-
     try {
-      const response = await fetch(`${API_URL}/surveys/${id}/questions`,{
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        }
-      }); // Replace with your API endpoint
+      const response = await fetch(`${API_URL}/surveys/${id}/questions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await response.json();
-      setApiResponse(data.questions);
-      setApiResponseCells(data.cells);
-      setApiResponseQuotas(data.quotas);
-
+      setApiResponse(data); // Store full response with .questions and .cells
+      setApiResponseQuotas(data.quotas || []);
     } catch (error) {
-      setError(error);
+      setError(error.message || "Unknown error");
     } finally {
-      setLoading(false); // Set loading to false
+      setLoading(false);
     }
   };
 
   const syncQuestion = async (event) => {
     const attributeId = event.target.getAttribute('data-attribute_id');
-  
     try {
-      const response = await fetch(`${API_URL}/questions/sync?attribute_id=${attributeId}`, {
-        method: 'GET',
+      await fetch(`${API_URL}/questions/sync?attribute_id=${attributeId}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       });
-  
-      const data = await response.json();
-      console.log('Sync successful:', data);
-  
-      // Call handleOpen after syncQuestion is successful
       await handleOpen();
     } catch (error) {
-      setError(error);
+      setError(error.message || "Unknown error");
     }
   };
 
-
   useEffect(() => {
     let total = 0;
-    (apiResponseQuotas || []).flat().forEach((item) => {
-      if (Array.isArray(item.cells) && item.cells.length > 0) {
-        total += item.count || 0;
-      }
-    });
-  
+    if (Array.isArray(apiResponseQuotas)) {
+      apiResponseQuotas.forEach((q) => {
+        if (Array.isArray(q)) {
+          q.forEach((item) => total += item.count || 0);
+        } else {
+          total += q.count || 0;
+        }
+      });
+    }
     setQuotasCount(total);
   }, [apiResponseQuotas]);
 
-  const handleView = () => {
-    navigate(`/projects/view/${id}`);
-  };
+  const handleCloseModal = () => setIsModalOpen(false);
+  const handleTabChange = (_, newValue) => setTabIndex(newValue);
+  const handleView = () => navigate(`/projects/view/${id}`);
 
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false); // Close modal
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setTabIndex(newValue);
-  };
-
-  
   return (
     <SoftBox display="flex" alignItems="center">
-
-      <SoftTypography variant="body1" color="info" sx={{ cursor: "pointer", lineHeight: 0 }} onClick={handleOpen}>
-        <Tooltip title="Screener Preview" placement="top">
+      <Tooltip title="Screener Preview">
+        <SoftTypography variant="body1" color="info" sx={{ cursor: "pointer", lineHeight: 0 }} onClick={handleOpen}>
           <Icon>visibility</Icon>
-        </Tooltip>
-      </SoftTypography>
-
-      <SoftTypography variant="body1" mx={1} color="secondary" sx={{ cursor: "pointer", lineHeight: 0 }} onClick={handleView}>
-        <Tooltip title="Project Preview" placement="top">
-          <Icon>visibility</Icon>
-        </Tooltip>
-      </SoftTypography>
-     
-        <SoftTypography variant="body1" mr={1} color="secondary" sx={{ cursor: "pointer", lineHeight: 0 }} >
-          <Tooltip title="Edit project" placement="top">
-            <Icon>edit</Icon>
-          </Tooltip>
         </SoftTypography>
+      </Tooltip>
 
-      <Dialog open={isModalOpen} onClose={handleCloseModal}  PaperProps={{ sx: {width: '70vw',height: '85vh',maxWidth: 'none',padding: '0px 10px'} }}>
+      <Tooltip title="Project Preview">
+        <SoftTypography variant="body1" mx={1} color="secondary" sx={{ cursor: "pointer", lineHeight: 0 }} onClick={handleView}>
+          <Icon>visibility</Icon>
+        </SoftTypography>
+      </Tooltip>
 
+      <Tooltip title="Edit Project">
+        <SoftTypography variant="body1" mr={1} color="secondary" sx={{ cursor: "pointer", lineHeight: 0 }}>
+          <Icon>edit</Icon>
+        </SoftTypography>
+      </Tooltip>
+
+      <Dialog
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        PaperProps={{ sx: { width: '70vw', height: '85vh', maxWidth: 'none', padding: '0px 10px' } }}
+      >
         <DialogTitle sx={{ textAlign: "center", fontSize: "22px" }}>
           Screener Preview
-          <SoftBox lineHeight={1} sx={{ textAlign: "left", fontSize: "18px", marginTop: "10px" }} color="primary" fontWeight="medium">
-            <span style={{ color: "#344767" }}>Quantish Code :</span> {quest_code} |{" "}
-            <span style={{ color: "#344767" }}>Quotas Count :</span> {quotasCount}
+          <SoftBox mt={1} color="primary" fontWeight="medium" sx={{ fontSize: "18px", textAlign: "left" }}>
+            <span style={{ color: "#344767" }}>Quantish Code:</span> {quest_code} | <span style={{ color: "#344767" }}>Quotas Count:</span> {quotasCount}
           </SoftBox>
         </DialogTitle>
 
@@ -139,200 +124,121 @@ function ActionCell({ id, quest_code }) {
         </Tabs>
 
         <DialogContent>
-        {loading ? (
-              <SoftBox display="flex" justifyContent="center" alignItems="center" height="100%">
-                <CircularProgress size={70}/>
-              </SoftBox>
-            ) : error ? (
-              <SoftBox display="flex" justifyContent="center" alignItems="center" height="420px">
-                <div>Error: {error}</div>
-              </SoftBox>
-            ) : tabIndex === 0 ? (
-            apiResponse &&
-            Object.values(apiResponse).map((questionData) => (
-              
-              <SoftBox key={questionData.id} mt={2}>
-               <SoftTypography
-                  sx={{
-                    fontSize: "15px",
-                    fontWeight: "bold",
-                    display: "flex", // Flex container
-                    alignItems: "center", // Vertically align items
-                  }}
-                >
+          {loading ? (
+            <SoftBox display="flex" justifyContent="center" alignItems="center" height="100%">
+              <CircularProgress size={70} />
+            </SoftBox>
+          ) : error ? (
+            <SoftBox display="flex" justifyContent="center" alignItems="center" height="420px">
+              <div>Error: {error}</div>
+            </SoftBox>
+          ) : tabIndex === 0 ? (
+            apiResponse?.questions && Object.entries(apiResponse.questions).map(([key, questionData]) => (
+              <SoftBox key={key} mt={2}>
+                <SoftTypography sx={{ fontSize: "15px", fontWeight: "bold", display: "flex", alignItems: "center" }}>
                   <Icon sx={{ mr: 1 }} color="primary">circle</Icon>
                   {questionData.question}
-
-                {questionData.options == '' && questionData.precodes == '' ? 
-                  <Icon sx={{ ml: 1 }} color="primary" data-attribute_id={questionData.client_question_id} onClick={syncQuestion}>refresh</Icon> : ''}
-
+                  {!questionData.options && !questionData.precodes && (
+                    <Icon sx={{ ml: 1 }} color="primary" data-attribute_id={questionData.client_question_id} onClick={syncQuestion}>refresh</Icon>
+                  )}
                 </SoftTypography>
 
-                <SoftBox mt={1} ml={3} >
-                  {questionData.type === "input" && (
-                      Object.values(questionData.options) != ''  
-                      ? (
-                          <SoftTypography sx={{ fontSize: "16px",wordWrap: "break-word"}}  variant="body2" >
-                            {Object.values(questionData.options).map((value, index) => value).join(",") }
-                          </SoftTypography>)
-                          : (
-                          <SoftTypography sx={{ fontSize: "16px" }}  variant="body2">
-                            {questionData.precodes.join(", ")}
-                          </SoftTypography>
-                      )
-                  )}
-
-                  {questionData.type === "radio" && (
-                    Object.values(questionData.options) != ''  ? (
-                      Object.values(questionData.options).map((value, index) => (
-                        <SoftTypography sx={{ fontSize: "16px" }} key={index} variant="body2">
-                          {value}
-                        </SoftTypography>
+                <SoftBox mt={1} ml={3}>
+                  {["input", "radio"].includes(questionData.type) ? (
+                    Object.values(questionData.options || {}).length > 0 ? (
+                      Object.values(questionData.options).map((val, i) => (
+                        <SoftTypography key={i} sx={{ fontSize: "16px" }}>{val || renderPrecodedValues(questionData.precodes)}</SoftTypography>
                       ))
                     ) : (
-                        <SoftTypography sx={{ fontSize: "16px" }}  variant="body2">
-                          {questionData.precodes.join(", ")}
-                        </SoftTypography>
+                      <SoftTypography sx={{ fontSize: "16px" }}>{renderPrecodedValues(questionData.precodes)}</SoftTypography>
                     )
-                  )}
-                  {questionData.type === "checkbox" && (
-                    Object.keys(questionData.options).map((key) => (
-                      <SoftTypography sx={{ fontSize:"16px" }} key={key} variant="body2">
-                        {questionData.options[key]}
-                      </SoftTypography>
-                    ))
-                  )}
-                   {questionData.type === "select" && (
-                    Object.keys(questionData.options).map((key) => (
-                      <SoftTypography sx={{ fontSize:"16px" }} key={key} variant="body2">
-                        {questionData.options[key]}
-                      </SoftTypography>
-                    ))
-                  )}
-                  {questionData.type === "date" && (
-                    Object.keys(questionData.options).map((key) => (
-                      <SoftTypography sx={{ fontSize:"16px" }} key={key} variant="body2">
-                        {questionData.options[key]}
-                      </SoftTypography>
+                  ) : (
+                    Object.entries(questionData.options || {}).map(([key, val]) => (
+                      <SoftTypography key={key} sx={{ fontSize: "16px" }}>{val}</SoftTypography>
                     ))
                   )}
                 </SoftBox>
               </SoftBox>
-            ))) : (
-              <SoftBox mt="2">
-              {apiResponseCells && apiResponseQuotas ? (
+            ))
+          ) : (
+            <SoftBox mt={2}>
+              {apiResponseQuotas.length > 0 ? (
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
                     <tr>
-                      <th style={{ border: "1px solid #ddd",padding: "2px 4px",fontSize: "14px", textAlign: "left"}}>Question</th>
-                      <th style={{ border: "1px solid #ddd",padding: "2px 4px",fontSize: "14px", textAlign: "left"}}>Status</th>
-                      <th style={{ border: "1px solid #ddd",padding: "2px 4px",fontSize: "14px", textAlign: "left"}}>Count</th>
-                      <th style={{ border: "1px solid #ddd",padding: "2px 4px",fontSize: "14px", textAlign: "left"}}>Locale</th>
-                      <th style={{ border: "1px solid #ddd",padding: "2px 4px",fontSize: "14px", textAlign: "left"}}>Options</th>
+                      <th style={thStyle}>Question</th>
+                      <th style={thStyle}>Status</th>
+                      <th style={thStyle}>Count</th>
+                      <th style={thStyle}>Locale</th>
+                      <th style={thStyle}>Options</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {apiResponseQuotas.map((group, groupIndex) =>
-                      
-                      group.map((item) =>
-                        item.cells.map((cellId) => {
-                          const quota = apiResponseCells[cellId];
-
-                          if (quota) {
+                    {apiResponseQuotas.flatMap((item, index) => {
+                      // Type 1: Array of quota sets with cell IDs
+                      if (Array.isArray(item)) {
+                        return item.flatMap((q, subIndex) =>
+                          q.cells.map((cellId, cellIdx) => {
+                            const questionData = apiResponse?.cells?.[cellId];
+                            const question = questionData?.question || "—";
+                            const options = questionData?.options ? Object.values(questionData.options).join(", ") : "";
+                            const precodes = questionData?.precodes ? renderPrecodedValues(questionData.precodes) : "";
+                            const locale = questionData?.locale || "—";
                             return (
-                              <tr key={`${groupIndex}-${cellId}`} style={{ border: "1px solid #ddd" }}>
-                                <td style={{ border: "1px solid #ddd", padding: "2px 4px", fontSize: "14px" }}>
-                                  {quota.question}
-                                </td>
-                                <td style={{ border: "1px solid #ddd", padding: "2px 4px", fontSize: "14px" }}>
-                                  {item.status}
-                                </td>
-                                <td style={{ border: "1px solid #ddd", padding: "2px 4px", fontSize: "14px" }}>
-                                  {item.count}
-                                </td>
-                                <td style={{ border: "1px solid #ddd", padding: "2px 4px", fontSize: "14px" }}>
-                                  {quota.locale}
-                                </td>
-                                <td style={{ border: "1px solid #ddd", padding: "2px 4px", fontSize: "14px" }}>
-
-                                  {quota.type === "input" && (
-                                      Object.values(quota.options) != ''  
-                                      ? (
-                                          <SoftTypography sx={{ fontSize: "16px",wordWrap: "break-word"}}  variant="body2" >
-                                            {Object.values(quota.options).map((value, index) => value).join(",") }
-                                          </SoftTypography>)
-                                          : (
-                                          <SoftTypography sx={{ fontSize: "16px" }}  variant="body2">
-                                            {quota.precodes.join(", ")}
-                                          </SoftTypography>
-                                      )
-                                  )}
-
-                                  { quota.type === "radio" && (
-                                      Object.values(quota.options) != ''  
-                                      ? (
-                                        Object.values(quota.options).map((value, index) => (
-                                          <SoftTypography sx={{ fontSize: "16px" }} key={index} variant="body2">
-                                            {value}
-                                          </SoftTypography>
-                                        )))
-                                      : (
-                                          <SoftTypography sx={{ fontSize: "16px" }}  variant="body2">
-                                            {quota.precodes.join(", ")}
-                                          </SoftTypography>
-                                        )
-                                    )
-                                  }
-                                  {quota.type === "checkbox" && (
-                                      Object.keys(quota.options).map((key) => (
-                                        <SoftTypography sx={{ fontSize:"16px" }} key={key} variant="body2">
-                                          {quota.options[key]}
-                                        </SoftTypography>
-                                      ))
-                                  )}
-                                  {quota.type === "select" && (
-                                    Object.keys(quota.options).map((key) => (
-                                      <SoftTypography sx={{ fontSize:"16px" }} key={key} variant="body2">
-                                        {quota.options[key]}
-                                      </SoftTypography>
-                                      ))
-                                  )}
-                                  {quota.type === "date" && (
-                                    Object.keys(quota.options).map((key) => (
-                                      <SoftTypography sx={{ fontSize:"16px" }} key={key} variant="body2">
-                                        {quota.options[key]}
-                                      </SoftTypography>
-                                    ))
-                                  )}
-                                </td>
+                              <tr key={`${index}-${subIndex}-${cellIdx}`}>
+                                <td style={tdStyle}>{question}</td>
+                                <td style={tdStyle}>{q.status}</td>
+                                <td style={tdStyle}>{q.count}</td>
+                                <td style={tdStyle}>{locale}</td>
+                                <td style={tdStyle}>{options || precodes || "—"}</td>
                               </tr>
                             );
-                          }
-                          return <tr key={`${groupIndex}-${cellId}`} ></tr>;
-                        })
-                      )
-                    )}
+                          })
+                        );
+                      }
+
+                      // Type 2: Flat object quota
+                      return (
+                        <tr key={index}>
+                          <td style={tdStyle}>{item.question}</td>
+                          <td style={tdStyle}>{item.status}</td>
+                          <td style={tdStyle}>{item.count}</td>
+                          <td style={tdStyle}>{item.locale}</td>
+                          <td style={tdStyle}>{item.options}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
-              ) : (
-                <p>No Data</p>
-              )}
+              ) : <p>No Data</p>}
             </SoftBox>
-            
-            )}
+          )}
         </DialogContent>
+
         <DialogActions>
           <SoftButton onClick={handleCloseModal} color="primary">Cancel</SoftButton>
         </DialogActions>
       </Dialog>
-
     </SoftBox>
   );
 }
 
+const thStyle = {
+  border: "1px solid #ddd",
+  padding: "4px 6px",
+  fontSize: "14px",
+  textAlign: "left",
+};
+
+const tdStyle = {
+  border: "1px solid #ddd",
+  padding: "4px 6px",
+  fontSize: "14px",
+};
+
 ActionCell.propTypes = {
-  id: PropTypes.number,
-  quest_code: PropTypes.any
+  id: PropTypes.number.isRequired,
+  quest_code: PropTypes.any,
 };
 
 export default ActionCell;
