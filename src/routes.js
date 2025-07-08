@@ -52,10 +52,10 @@ import { Navigate } from "react-router-dom";
 import Document from "examples/Icons/Document";
 
 //Imports by Monika
-import LeaveSummary from "layouts/leavetracker/components/leavesummary";
+/* import LeaveSummary from "layouts/leavetracker/components/leavesummary";
 import InterviewEvaluationForm from "layouts/forms/interviewevaluationform";
 import JobApplicationForm from "layouts/forms/jobapplicationform";
-
+ */
 const routesArray = [
   {
     type: "route",
@@ -392,7 +392,7 @@ const routesArray = [
   noCollapse: true,
   permissions: ["viewIdleLogs"],
 },
-{
+/* {
         type: "collapse",
         name: "LeaveTracker",
         key: "leave-tracker",
@@ -400,8 +400,8 @@ const routesArray = [
          route: "/leavetracker/components/leavesummary",
          component: <LeaveSummary />,
          noCollapse: true,
-      },
-{
+      }, */
+/* {
         type: "collapse",
         name: "Forms",
         key: "forms",
@@ -420,7 +420,7 @@ const routesArray = [
             component: <JobApplicationForm />,
           },
         ],
-      },
+      }, */
 
 ];
 
