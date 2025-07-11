@@ -224,11 +224,8 @@ function ProductsList() {
           <InfoCell country_code={item.country_code} language_code={item.language_code} client_survey_status={item.client_survey_status} />
         ) : "****",
         completes_cpi: hasPermission("viewprojects.completes_cpi") ? (
-          <CompleteCell completes_count={item.completes_count} quota={item.quota} /* cpi={item.cpi} */ />
+          <CompleteCell completes_count={item.completes_count} quota={item.quota} cpi={item.cpi} />
         ) : "****",
-        cpi: hasPermission("viewprojects.cpi") ? (
-          <span style={{ color: "#17c1e8" }}>{item.cpi}</span>
-        ) : null,
         link: hasPermission("viewprojects.links") ? (
           <LinkCell survey_id={item.id} quest_code={item.name} />
         ) : null,
@@ -281,7 +278,6 @@ function ProductsList() {
       hasPermission("viewprojects.client_info") && { name: "account_name", align: "left" },
       hasPermission("viewprojects.country_info") && { name: "country", align: "left" },
       hasPermission("viewprojects.completes_cpi") && { name: "completes_cpi", align: "center" },
-      hasPermission("viewprojects.cpi") && { name: "cpi", align: "center" },
       hasPermission("viewprojects.links") && { name: "link", align: "center" },
       hasPermission("viewprojects.dates") && { name: "created", align: "center" },
       hasPermission("viewprojects.dates") && { name: "date", align: "center" },

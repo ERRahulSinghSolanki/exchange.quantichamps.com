@@ -19,17 +19,20 @@ const AddUser = () => {
     password_confirmation: "",
     branch_id: "",
     shift_id: null,
+    shift_ids: [],
     manager_id: "",
     team_leader_id: "",
-    roles: [4],
+    roles: [],
   });
 
   const [branches, setBranches] = useState([]);
   const [shifts, setShifts] = useState([]);
   const [managers, setManagers] = useState([]);
   const [teamLeaders, setTeamLeaders] = useState([]);
+  const [availableRoles, setAvailableRoles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", color: "success" });
+  const [isManagerRole, setIsManagerRole] = useState(false);
 
   const fetchWithAuth = async (url, options = {}) => {
     const token = localStorage.getItem("authToken");
@@ -49,15 +52,23 @@ const AddUser = () => {
   };
 
   useEffect(() => {
-    const loadBranches = async () => {
+    const loadInitialData = async () => {
       try {
-        const data = await fetchWithAuth(`${API_URL}/branches`);
-        setBranches(data.data || []);
+        const [branchesData, rolesData] = await Promise.all([
+          fetchWithAuth(`${API_URL}/branches`),
+          fetchWithAuth(`${API_URL}/roles`),
+        ]);
+        
+        setBranches(branchesData.data || []);
+        
+        // Filter out Admin role (assuming Admin has ID 1)
+        const filteredRoles = rolesData.roles ? rolesData.roles.filter(role => role.id !== 1) : [];
+        setAvailableRoles(filteredRoles);
       } catch (err) {
-        setSnackbar({ open: true, message: "Failed to load branches", color: "error" });
+        setSnackbar({ open: true, message: "Failed to load initial data", color: "error" });
       }
     };
-    loadBranches();
+    loadInitialData();
   }, []);
 
   useEffect(() => {
@@ -103,18 +114,37 @@ const AddUser = () => {
     setFormData((prev) => ({ ...prev, shift_id: shiftId }));
   };
 
+  const handleMultiShiftChange = (e) => {
+    const selectedOptions = Array.from(e.target.selectedOptions).map(option => parseInt(option.value));
+    setFormData((prev) => ({ ...prev, shift_ids: selectedOptions }));
+  };
+
+  const handleRoleChange = (e) => {
+    const selectedRoleId = parseInt(e.target.value);
+    const isManager = availableRoles.find(role => role.id === selectedRoleId)?.name.toLowerCase() === 'manager';
+    setIsManagerRole(isManager);
+    setFormData((prev) => ({ ...prev, roles: [selectedRoleId] }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const payload = {
         ...formData,
-        shift_id: parseInt(formData.shift_id),
         branch_id: parseInt(formData.branch_id),
         manager_id: parseInt(formData.manager_id),
         team_leader_id: parseInt(formData.team_leader_id),
-        roles: [4],
       };
+
+      // For manager role, use shift_ids, otherwise use shift_id
+      if (isManagerRole) {
+        payload.shift_ids = formData.shift_ids.map(id => parseInt(id));
+        delete payload.shift_id;
+      } else {
+        payload.shift_id = parseInt(formData.shift_id);
+        delete payload.shift_ids;
+      }
 
       await fetchWithAuth(`${API_URL}/users`, {
         method: "POST",
@@ -122,7 +152,7 @@ const AddUser = () => {
       });
 
       setSnackbar({ open: true, message: "User added successfully", color: "success" });
-      setTimeout(() => navigate("/projects/users/list"), 1500);
+      setTimeout(() => navigate("/users/list"), 1500);
     } catch (err) {
       setSnackbar({ open: true, message: err.message, color: "error" });
     } finally {
@@ -171,6 +201,29 @@ const AddUser = () => {
             <SoftInput type="password" name="password_confirmation" value={formData.password_confirmation} onChange={handleChange} required fullWidth />
           </SoftBox>
 
+          {/* Role - Moved above Branch */}
+          <SoftBox mb={2}>
+            <SoftTypography variant="caption" fontWeight="bold">Role</SoftTypography>
+            <select
+              name="roles"
+              value={formData.roles[0] || ""}
+              onChange={handleRoleChange}
+              required
+              style={{
+                width: "100%",
+                padding: "8px",
+                borderRadius: "6px",
+                border: "1px solid #d2d6da",
+                fontSize: "14px"
+              }}
+            >
+              <option value="">Select Role</option>
+              {availableRoles.map((role) => (
+                <option key={role.id} value={role.id}>{role.name}</option>
+              ))}
+            </select>
+          </SoftBox>
+
           {/* Branch */}
           <SoftBox mb={2}>
             <SoftTypography variant="caption" fontWeight="bold">Branch</SoftTypography>
@@ -194,31 +247,60 @@ const AddUser = () => {
             </select>
           </SoftBox>
 
-          {/* Shift */}
-          <SoftBox mb={2}>
-            <SoftTypography variant="caption" fontWeight="bold">Shift</SoftTypography>
-            <select
-              name="shift_id"
-              value={formData.shift_id || ""}
-              onChange={handleShiftChange}
-              disabled={!formData.branch_id}
-              required
-              style={{
-                width: "100%",
-                padding: "8px",
-                borderRadius: "6px",
-                border: "1px solid #d2d6da",
-                fontSize: "14px"
-              }}
-            >
-              <option value="">Select Shift</option>
-              {shifts.map((shift) => (
-                <option key={shift.id} value={shift.id}>
-                  {`${shift.type.charAt(0).toUpperCase() + shift.type.slice(1)} [${shift.shift_code} ${shift.start_time} - ${shift.end_time}]`}
-                </option>
-              ))}
-            </select>
-          </SoftBox>
+          {/* Shift Selection - Conditional based on role */}
+          {isManagerRole ? (
+            <SoftBox mb={2}>
+              <SoftTypography variant="caption" fontWeight="bold">Shifts (Multiple select for Manager)</SoftTypography>
+              <select
+                name="shift_ids"
+                multiple
+                value={formData.shift_ids}
+                onChange={handleMultiShiftChange}
+                disabled={!formData.branch_id}
+                required
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  borderRadius: "6px",
+                  border: "1px solid #d2d6da",
+                  fontSize: "14px",
+                  minHeight: "100px"
+                }}
+              >
+                {shifts.map((shift) => (
+                  <option key={shift.id} value={shift.id}>
+                    {`${shift.type.charAt(0).toUpperCase() + shift.type.slice(1)} [${shift.shift_code} ${shift.start_time} - ${shift.end_time}]`}
+                  </option>
+                ))}
+              </select>
+              <SoftTypography variant="caption" color="text">Hold Ctrl/Cmd to select multiple shifts</SoftTypography>
+            </SoftBox>
+          ) : (
+            <SoftBox mb={2}>
+              <SoftTypography variant="caption" fontWeight="bold">Shift</SoftTypography>
+              <select
+                name="shift_id"
+                value={formData.shift_id || ""}
+                onChange={handleShiftChange}
+                disabled={!formData.branch_id}
+                required
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  borderRadius: "6px",
+                  border: "1px solid #d2d6da",
+                  fontSize: "14px"
+                }}
+              >
+                <option value="">Select Shift</option>
+                {shifts.map((shift) => (
+                  <option key={shift.id} value={shift.id}>
+                    {`${shift.type.charAt(0).toUpperCase() + shift.type.slice(1)} [${shift.shift_code} ${shift.start_time} - ${shift.end_time}]`}
+                  </option>
+                ))}
+              </select>
+            </SoftBox>
+          )}
 
           {/* Manager */}
           <SoftBox mb={2}>
@@ -266,15 +348,9 @@ const AddUser = () => {
             </select>
           </SoftBox>
 
-          {/* Role */}
-          <SoftBox mb={2}>
-            <SoftTypography variant="caption" fontWeight="bold">Role</SoftTypography>
-            <SoftInput value="User" readOnly fullWidth style={{ backgroundColor: "#f0f0f0", cursor: "not-allowed" }} />
-          </SoftBox>
-
           {/* Submit */}
           <SoftBox mt={3} display="flex" justifyContent="flex-end" gap={2}>
-            <SoftButton color="secondary" onClick={() => navigate("/projects/users/list")}>Cancel</SoftButton>
+            <SoftButton color="secondary" onClick={() => navigate("/users/list")}>Cancel</SoftButton>
             <SoftButton type="submit" color="dark" disabled={loading}>
               {loading ? "Adding..." : "Add User"}
             </SoftButton>

@@ -26,7 +26,7 @@ import AllBreaks from "layouts/breaks/all";
 import MyAttendance from "layouts/attendance/my";
 import AllAttendance from "layouts/attendance/all";
 
-//import AttendanceSummary from "./layouts/attendance/component/attendancesummary";
+import AttendanceSummary from "./layouts/attendance/component/attendancesummary";
 
 import AddUser from "layouts/users/add";
 import UserList from "layouts/users/list";
@@ -136,7 +136,7 @@ const routesArray = [
     noCollapse: true,
     permissions: ["viewStudies"],
   },
-   /* {
+    {
     type: "collapse",
     name: "Attendance",
     key: "attendance",
@@ -144,7 +144,8 @@ const routesArray = [
     icon: <Document size="12px" />,
     component: <AttendanceSummary />,
     noCollapse: true,
-  }, */
+    permissions: ["viewAttendanceSummary"]
+  }, 
   {
   type: "collapse",
   name: "Notifications",

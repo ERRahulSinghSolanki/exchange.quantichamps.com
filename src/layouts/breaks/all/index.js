@@ -6,9 +6,11 @@ import SoftTypography from "components/SoftTypography";
 import Table from "examples/Tables/Table";
 import CircularProgress from "@mui/material/CircularProgress";
 import { API_URL } from "config";
-import { useAuth } from "../../../AuthContext"; // ✅ shared auth context
+import { useAuth } from "../../../AuthContext";
+import TextField from "@mui/material/TextField";
+import SoftButton from "components/SoftButton";
 
-// 🔧 Utility function to format duration, e.g. "3 min 20 sec"
+// Utility function to format duration
 const formatDuration = (durationMinutes) => {
   const totalSeconds = Math.round(durationMinutes * 60);
   const minutes = Math.floor(totalSeconds / 60);
@@ -20,25 +22,33 @@ const formatDuration = (durationMinutes) => {
   return `${minutes} min ${seconds} sec`;
 };
 
-const PERMISSION_PREFIX = "allbreaks."; // 🌟 column‑level permission prefix
+const PERMISSION_PREFIX = "allbreaks.";
 
 const AllBreaksTable = () => {
   const { permissions: authPermissions = [] } = useAuth();
-
   const [breaks, setBreaks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchName, setSearchName] = useState("");
+  const [pagination, setPagination] = useState({
+    page: 1,
+    perPage: 25,
+    total: 0,
+  });
+  const [pageInput, setPageInput] = useState(1);
 
-  /* -------------------------------------------------------------------------- */
-  /*                               Fetch data                                   */
-  /* -------------------------------------------------------------------------- */
+  // Fetch data with pagination and search
   const fetchBreaks = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("authToken");
-      const res = await fetch(`${API_URL}/attendance/breaks/all`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${API_URL}/attendance/breaks/all?page=${pagination.page}&per_page=${pagination.perPage}&q=${searchName}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const json = await res.json();
 
@@ -58,6 +68,10 @@ const AllBreaksTable = () => {
       }));
 
       setBreaks(formatted);
+      setPagination((prev) => ({
+        ...prev,
+        total: json.total || json.data?.length || 0,
+      }));
     } catch (err) {
       console.error("Error fetching all breaks:", err);
       setBreaks([]);
@@ -68,11 +82,19 @@ const AllBreaksTable = () => {
 
   useEffect(() => {
     fetchBreaks();
-  }, []);
+  }, [pagination.page, pagination.perPage, searchName]);
 
-  /* -------------------------------------------------------------------------- */
-  /*                Column definition WITH permission property                  */
-  /* -------------------------------------------------------------------------- */
+  useEffect(() => {
+    setPageInput(pagination.page);
+  }, [pagination.page]);
+
+  const handlePageChange = (newPage) => {
+    const totalPages = Math.ceil(pagination.total / pagination.perPage);
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPagination((p) => ({ ...p, page: newPage }));
+    }
+  };
+
   const baseColumns = useMemo(
     () => [
       { name: "id", align: "left", permission: `${PERMISSION_PREFIX}id` },
@@ -88,17 +110,11 @@ const AllBreaksTable = () => {
     []
   );
 
-  /* -------------------------------------------------------------------------- */
-  /*                Filter allowed columns based on permissions                 */
-  /* -------------------------------------------------------------------------- */
   const allowedColumns = useMemo(() => {
-    if (!authPermissions || authPermissions.length === 0) return baseColumns; // legacy
+    if (!authPermissions || authPermissions.length === 0) return baseColumns;
     return baseColumns.filter((c) => authPermissions.includes(c.permission));
   }, [baseColumns, authPermissions]);
 
-  /* -------------------------------------------------------------------------- */
-  /*                             Construct rows                                 */
-  /* -------------------------------------------------------------------------- */
   const allRows = useMemo(
     () =>
       breaks.map((b) => ({
@@ -119,9 +135,6 @@ const AllBreaksTable = () => {
     [breaks]
   );
 
-  /* -------------------------------------------------------------------------- */
-  /*                Trim rows to allowed column keys only                       */
-  /* -------------------------------------------------------------------------- */
   const allowedRows = useMemo(() => {
     return allRows.map((row) => {
       const subset = {};
@@ -132,16 +145,81 @@ const AllBreaksTable = () => {
     });
   }, [allRows, allowedColumns]);
 
-  /* -------------------------------------------------------------------------- */
-  /*                                  Render                                    */
-  /* -------------------------------------------------------------------------- */
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <SoftBox p={3}>
-        <SoftTypography variant="h5" fontWeight="medium" mb={3}>
-          All Breaks
-        </SoftTypography>
+        <SoftBox display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <SoftTypography variant="h5" fontWeight="medium">
+            All Breaks
+          </SoftTypography>
+        </SoftBox>
+
+        {/* Search by Name */}
+        <SoftBox display="flex" justifyContent="center" flexDirection="column" alignItems="center" mb={3}>
+          <SoftTypography variant="button" fontWeight="bold" mb={1}>
+            Search by Name
+          </SoftTypography>
+          <TextField
+            variant="outlined"
+            size="small"
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+            placeholder="Enter name..."
+          />
+        </SoftBox>
+
+        {/* Pagination Controls */}
+        <SoftBox display="flex" justifyContent="center" alignItems="center" my={2} gap={1}>
+          <SoftButton
+            size="small"
+            variant="outlined"
+            onClick={() => handlePageChange(1)}
+            disabled={pagination.page === 1}
+          >
+            {"<<"}
+          </SoftButton>
+          <SoftButton
+            size="small"
+            variant="outlined"
+            onClick={() => handlePageChange(pagination.page - 1)}
+            disabled={pagination.page === 1}
+          >
+            {"<"}
+          </SoftButton>
+          <input
+            type="number"
+            value={pageInput}
+            min={1}
+            max={Math.ceil(pagination.total / pagination.perPage)}
+            onChange={(e) => setPageInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handlePageChange(parseInt(pageInput))}
+            onBlur={() => handlePageChange(parseInt(pageInput))}
+            style={{
+              width: "60px",
+              textAlign: "center",
+              padding: "6px",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+            }}
+          />
+          <SoftButton
+            size="small"
+            variant="outlined"
+            onClick={() => handlePageChange(pagination.page + 1)}
+            disabled={pagination.page >= Math.ceil(pagination.total / pagination.perPage)}
+          >
+            {">"}
+          </SoftButton>
+          <SoftButton
+            size="small"
+            variant="outlined"
+            onClick={() => handlePageChange(Math.ceil(pagination.total / pagination.perPage))}
+            disabled={pagination.page >= Math.ceil(pagination.total / pagination.perPage)}
+          >
+            {">>"}
+          </SoftButton>
+        </SoftBox>
 
         {loading ? (
           <SoftBox display="flex" justifyContent="center" py={6}>
@@ -153,7 +231,7 @@ const AllBreaksTable = () => {
           </SoftTypography>
         ) : allowedColumns.length === 0 ? (
           <SoftTypography variant="body2" color="text">
-            Sorry ! You don&apos;t have permission.
+            Sorry! You don&apos;t have permission.
           </SoftTypography>
         ) : (
           <Table columns={allowedColumns} rows={allowedRows} />

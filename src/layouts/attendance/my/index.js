@@ -6,7 +6,8 @@ import SoftTypography from "components/SoftTypography";
 import Table from "examples/Tables/Table";
 import CircularProgress from "@mui/material/CircularProgress";
 import { API_URL } from "config";
-import { useAuth } from "../../../AuthContext"; // 🆕 central auth context
+import { useAuth } from "../../../AuthContext";
+import SoftPagination from "components/SoftPagination";
 
 // ✅ Format to: "22 Jun 2025, 09:18 AM"
 const formatDateTime = (datetime) => {
@@ -29,6 +30,8 @@ const MyAttendanceTable = () => {
 
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 20;
 
   /* -------------------------------------------------------------------------- */
   /*                           Fetch attendance data                            */
@@ -38,7 +41,7 @@ const MyAttendanceTable = () => {
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("No auth token found");
 
-      const response = await fetch(`${API_URL}/attendance/my`, {
+      const response = await fetch(`${API_URL}/attendance/my?page=${currentPage}&per_page=${rowsPerPage}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -64,7 +67,7 @@ const MyAttendanceTable = () => {
 
   useEffect(() => {
     fetchMyAttendance();
-  }, []);
+  }, [currentPage]);
 
   /* -------------------------------------------------------------------------- */
   /*               Master list of columns WITH `permission` key                 */
@@ -142,6 +145,15 @@ const MyAttendanceTable = () => {
   }, [allRows, allowedColumns]);
 
   /* -------------------------------------------------------------------------- */
+  /*                          Pagination Logic                                   */
+  /* -------------------------------------------------------------------------- */
+  const totalPages = Math.ceil(attendanceData.length / rowsPerPage);
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+  };
+
+  /* -------------------------------------------------------------------------- */
   /*                                Render UI                                   */
   /* -------------------------------------------------------------------------- */
   return (
@@ -165,7 +177,18 @@ const MyAttendanceTable = () => {
             Sorry ! You don&apos;t have permission.
           </SoftTypography>
         ) : (
-          <Table columns={allowedColumns} rows={allowedRows} />
+          <>
+            <Table columns={allowedColumns} rows={allowedRows} />
+            {/* Pagination */}
+            <SoftBox display="flex" justifyContent="center" mt={3}>
+              <SoftPagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="info"
+              />
+            </SoftBox>
+          </>
         )}
       </SoftBox>
     </DashboardLayout>

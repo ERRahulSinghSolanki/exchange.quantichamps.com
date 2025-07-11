@@ -1,0 +1,50 @@
+.day-row {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 12px;
+  transition: all 0.2s ease-in-out;
+  
+}
+
+.day-row:hover {
+  background-color: #f9f9f9;
+}
+
+.timeline-bar-container {
+  height: 6px;
+  background-color: #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+   
+}
+
+.timeline-bar-fill {
+  height: 100%;
+  border-radius: 12px;
+   margin-left: 250px;
+  width: 850px;
+}
+
+@keyframes dashMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 0;
+  }
+}
+
+.animated-progress {
+  background-image: repeating-linear-gradient(
+    to right,
+    #4caf50,
+    #4caf50 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  background-size: 40px 6px;
+  animation: dashMove 1s linear infinite;
+}
