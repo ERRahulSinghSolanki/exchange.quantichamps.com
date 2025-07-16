@@ -51,6 +51,12 @@ import IdleLogs from "layouts/idel-log";
 import { Navigate } from "react-router-dom";
 import Document from "examples/Icons/Document";
 
+import LeaveSummary from "layouts/leavetracker/components/leavesummary";
+import FormsSection from "layouts/formssection/index";
+import RejectedUserData from "layouts/RejectedUserData/index";
+import UserBasicInfo from "layouts/NewUser";
+import UserData from "layouts/userdata/index";
+
 //Imports by Monika
 /* import LeaveSummary from "layouts/leavetracker/components/leavesummary";
 import InterviewEvaluationForm from "layouts/forms/interviewevaluationform";
@@ -393,6 +399,53 @@ const routesArray = [
   noCollapse: true,
   permissions: ["viewIdleLogs"],
 },
+
+{
+        type: "collapse",
+        name: "Forms Section",
+        key: "forms-section",
+        icon: <Document size="12px" />,
+        route: "/formssection/formssection",
+        component: <FormsSection />,
+        noCollapse: true,
+      },
+      {
+        type: "collapse",
+        name: "LeaveTracker",
+        key: "leave-tracker",
+        icon: <Document size="12px" />,
+         route: "/leavetracker/components/leavesummary",
+         component: <LeaveSummary />,
+         noCollapse: true,
+      },
+      {
+        type: "collapse",
+        name: "UserData",
+        key: "user-data",
+        icon: <Document size="12px" />,
+        route: "/userdata/userdata",
+        component: <UserData />,
+        noCollapse: true,
+      },
+      {
+        type: "collapse",
+        name: "RejectedUserData",
+        key: "rejected-user-data",
+        icon: <Document size="12px" />,
+        route: "/RejectedUserData/RejectedUserData",
+        component: <RejectedUserData />,
+        noCollapse: true,
+      },
+      {
+        type: "route",
+        name: "UserBasicInfo",
+        key: "UserBasicInfo",
+        icon: <Document size="12px" />,
+        route: "/newuser/index",
+        component: <UserBasicInfo />,
+        noCollapse: true,
+      },
+
 /* {
         type: "collapse",
         name: "LeaveTracker",
