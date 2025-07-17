@@ -23,8 +23,7 @@ import LeaveApplyForm from "layouts/leave/apply";
 import LeaveHistory from "layouts/leave/history";
 import MyBreaks from "layouts/breaks/my";
 import AllBreaks from "layouts/breaks/all";
-import MyAttendance from "layouts/attendance/my";
-import AllAttendance from "layouts/attendance/all";
+
 
 import AttendanceSummary from "./layouts/attendance/component/attendancesummary";
 
@@ -231,26 +230,6 @@ const routesArray = [
   component: <AllBreaks />,
   noCollapse: true,
   permissions: ["viewAllBreaks"],
-},
-{
-  type: "collapse",
-  name: "My Attendance",
-  key: "my-attendance",
-  icon: <Document size="12px" />,
-  route: "/attendance/my",
-  component: <MyAttendance />,
-  noCollapse: true,
-  permissions: ["viewMyAttendance"],
-},
-{
-  type: "collapse",
-  name: "All Attendance",
-  key: "all-attendance",
-  icon: <Document size="12px" />,
-  route: "/attendance/all",
-  component: <AllAttendance />,
-  noCollapse: true,
-  permissions: ["viewAllAttendance"],
 },
 {
   type: "collapse",
