@@ -50,6 +50,9 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
   const [openMenu, setOpenMenu] = useState(false);
   const [loading, setLoading] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [shiftEndTime, setShiftEndTime] = useState(null);
+  const [logoutTimer, setLogoutTimer] = useState(null);
 
   /* ──────────────────────────────────────
      GLOBAL CONTEXTS
@@ -57,7 +60,7 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
   const [controller, dispatch] = useSoftUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator } = controller;
 
-  const { isLoggedIn, logout: authLogout } = useAuth();           // 👈 NEW
+  const { isLoggedIn, logout: authLogout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const route = location.pathname.split("/").slice(1);
@@ -95,13 +98,69 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
     checkActiveBreak();
   }, []);
 
+  // Get user name and shift end time from localStorage
+  useEffect(() => {
+    const name = localStorage.getItem("name");
+    if (name) {
+      setUserName(name);
+    }
+    
+    const fetchShiftEndTime = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (token) {
+          const { data } = await axios.get(`${API_URL}/user/shift-end-time`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setShiftEndTime(new Date(data.shift_end_time));
+        }
+      } catch (err) {
+        console.error("Failed to fetch shift end time", err);
+      }
+    };
+    
+    fetchShiftEndTime();
+  }, []);
+
+  // Auto logout 15 minutes after shift end time for normal users
+  useEffect(() => {
+    if (!shiftEndTime || ["Admin", "Manager"].includes(localStorage.getItem("role") || !isLoggedIn)) {
+      return;
+    }
+
+    const checkAutoLogout = () => {
+      const now = new Date();
+      const shiftEndPlus15 = new Date(shiftEndTime.getTime() + 15 * 60000); // 15 minutes after shift end
+
+      if (now > shiftEndPlus15) {
+        // Time to auto logout
+        handleAutoLogout();
+      } else {
+        // Set timer for remaining time
+        const remainingTime = shiftEndPlus15 - now;
+        const timer = setTimeout(() => {
+          handleAutoLogout();
+        }, remainingTime);
+        setLogoutTimer(timer);
+      }
+    };
+
+    checkAutoLogout();
+
+    return () => {
+      if (logoutTimer) {
+        clearTimeout(logoutTimer);
+      }
+    };
+  }, [shiftEndTime, isLoggedIn]);
+
   /* ──────────────────────────────────────
      UI HANDLERS
      ────────────────────────────────────── */
-  const handleMiniSidenav   = () => setMiniSidenav(dispatch, !miniSidenav);
-  const handleConfigurator  = () => setOpenConfigurator(dispatch, !openConfigurator);
-  const handleOpenMenu      = (e) => setOpenMenu(e.currentTarget);
-  const handleCloseMenu     = () => setOpenMenu(false);
+  const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
+  const handleConfigurator = () => setOpenConfigurator(dispatch, !openConfigurator);
+  const handleOpenMenu = (e) => setOpenMenu(e.currentTarget);
+  const handleCloseMenu = () => setOpenMenu(false);
 
   /* Break start / end */
   const handleStartBreak = async () => {
@@ -126,6 +185,18 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
   };
 
   /* ──────────────────────────────────────
+     AUTO LOGOUT HANDLER
+     ────────────────────────────────────── */
+  const handleAutoLogout = async () => {
+    try {
+      await authLogout();
+      navigate("/authentication/sign-in/illustration", { replace: true });
+    } catch (err) {
+      console.error("Auto logout failed", err);
+    }
+  };
+
+  /* ──────────────────────────────────────
      LOGOUT LOGIC
      ────────────────────────────────────── */
   const userRole = localStorage.getItem("role") || "";
@@ -138,20 +209,20 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const shiftEnd        = new Date(data.shift_end_time);
-      const now             = new Date();
-      const isAdminManager  = ["Admin", "Manager"].includes(userRole);
+      const shiftEnd = new Date(data.shift_end_time);
+      const now = new Date();
+      const isAdminManager = ["Admin", "Manager"].includes(userRole);
 
       /* ── 1. Admin / Manager  ─────────────────────────── */
       if (isAdminManager) {
-        await authLogout();                                        // 👈  update context
+        await authLogout();
         navigate("/authentication/sign-in/illustration", { replace: true });
         return;
       }
 
       /* ── 2. Normal user still within shift → auto break */
       if (now < shiftEnd) {
-        await handleStartBreak();                                  // don't logout
+        await handleStartBreak();
         return;
       }
 
@@ -160,7 +231,7 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
       navigate("/authentication/sign-in/illustration", { replace: true });
     } catch (err) {
       console.error("Logout condition check failed", err);
-      await authLogout();                                          // fallback
+      await authLogout();
       navigate("/authentication/sign-in/illustration", { replace: true });
     } finally {
       setLogoutLoading(false);
@@ -233,6 +304,18 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
             <SoftBox color={light ? "white" : "inherit"}>
               {isLoggedIn ? (
                 <>
+                  {/* Welcome message */}
+                  {userName && (
+                    <SoftTypography
+                      variant="button"
+                      fontWeight="medium"
+                      color={light ? "white" : "dark"}
+                      sx={{ mr: 2, display: "inline-block" }}
+                    >
+                      Welcome - {userName}
+                    </SoftTypography>
+                  )}
+
                   {/* Start Break button for non‑admin/non‑manager */}
                   {!["Admin", "Manager"].includes(userRole) && !onBreak && (
                     <IconButton

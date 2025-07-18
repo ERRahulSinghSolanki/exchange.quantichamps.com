@@ -16,7 +16,8 @@ import { API_URL } from "config";
 const AuthContext = createContext({
   isLoggedIn: false,
   isAuthReady: false,
-  logout: () => {},            // 👈  renamed (was handleLogout)
+  logout: () => {},
+  login: () => {},
   user: null,
   roles: [],
   permissions: [],
@@ -32,6 +33,31 @@ export const AuthProvider = ({ children }) => {
   const [roles, setRoles] = useState([]);
   const [permissions, setPermissions] = useState([]);
 
+  /* ---------- Login function ---------- */
+  const login = useCallback(async (email, password) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/login`, {
+        email,
+        password
+      });
+      
+      const { token, user } = response.data;
+      localStorage.setItem("authToken", token);
+      
+      // Store user details
+      setUser(user);
+      if (user?.name) {
+        localStorage.setItem("name", user.name);
+      }
+      
+      setIsLoggedIn(true);
+      return true;
+    } catch (error) {
+      console.error("Login failed:", error);
+      return false;
+    }
+  }, []);
+
   /* ---------- Fetch current user ---------- */
   const fetchUser = useCallback(async () => {
     try {
@@ -43,12 +69,18 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      // Update state
       setUser(data.user || {});
       setRoles(data.roles || []);
       setPermissions(data.permissions || []);
       setIsLoggedIn(true);
 
-      /* Persist role / permissions for route‑filtering */
+      // Store user name if available
+      if (data.user?.name) {
+        localStorage.setItem("name", data.user.name);
+      }
+
+      /* Persist role / permissions */
       if (data.roles?.length) {
         localStorage.setItem("role", data.roles[0]);
       }
@@ -59,13 +91,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error("❌ Auth error:", err);
       /* Purge everything on failure */
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("role");
-      localStorage.removeItem("permissions");
-      setIsLoggedIn(false);
-      setUser(null);
-      setRoles([]);
-      setPermissions([]);
+      logout();
     } finally {
       setIsAuthReady(true);
     }
@@ -81,29 +107,30 @@ export const AuthProvider = ({ children }) => {
     }
   }, [fetchUser]);
 
-  /* ---------- Logout (only state + storage) ---------- */
+  /* ---------- Logout (clears all data) ---------- */
   const logout = useCallback(() => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("role");
     localStorage.removeItem("permissions");
+    localStorage.removeItem("name"); // Clear user name
     setIsLoggedIn(false);
     setUser(null);
     setRoles([]);
     setPermissions([]);
-    /* No redirect here – leave navigation to the caller */
   }, []);
 
-  /* ---------- Memo value ---------- */
+  /* ---------- Memoized context value ---------- */
   const value = useMemo(
     () => ({
       isLoggedIn,
       isAuthReady,
-      logout,          // 👈  exposed to consumers
+      logout,
+      login,
       user,
       roles,
       permissions,
     }),
-    [isLoggedIn, isAuthReady, logout, user, roles, permissions]
+    [isLoggedIn, isAuthReady, logout, login, user, roles, permissions]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
