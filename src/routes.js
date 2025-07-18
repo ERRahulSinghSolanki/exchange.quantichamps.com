@@ -23,8 +23,7 @@ import LeaveApplyForm from "layouts/leave/apply";
 import LeaveHistory from "layouts/leave/history";
 import MyBreaks from "layouts/breaks/my";
 import AllBreaks from "layouts/breaks/all";
-import MyAttendance from "layouts/attendance/my";
-import AllAttendance from "layouts/attendance/all";
+
 
 import AttendanceSummary from "./layouts/attendance/component/attendancesummary";
 
@@ -50,6 +49,12 @@ import IdleLogs from "layouts/idel-log";
 
 import { Navigate } from "react-router-dom";
 import Document from "examples/Icons/Document";
+
+import LeaveSummary from "layouts/leavetracker/components/leavesummary";
+import FormsSection from "layouts/formssection/index";
+import RejectedUserData from "layouts/RejectedUserData/index";
+import UserBasicInfo from "layouts/NewUser";
+import UserData from "layouts/userdata/index";
 
 //Imports by Monika
 /* import LeaveSummary from "layouts/leavetracker/components/leavesummary";
@@ -228,26 +233,6 @@ const routesArray = [
 },
 {
   type: "collapse",
-  name: "My Attendance",
-  key: "my-attendance",
-  icon: <Document size="12px" />,
-  route: "/attendance/my",
-  component: <MyAttendance />,
-  noCollapse: true,
-  permissions: ["viewMyAttendance"],
-},
-{
-  type: "collapse",
-  name: "All Attendance",
-  key: "all-attendance",
-  icon: <Document size="12px" />,
-  route: "/attendance/all",
-  component: <AllAttendance />,
-  noCollapse: true,
-  permissions: ["viewAllAttendance"],
-},
-{
-  type: "collapse",
   name: "User",
   key: "users",
   icon: <Document size="12px" />,
@@ -393,6 +378,53 @@ const routesArray = [
   noCollapse: true,
   permissions: ["viewIdleLogs"],
 },
+
+{
+        type: "collapse",
+        name: "Forms Section",
+        key: "forms-section",
+        icon: <Document size="12px" />,
+        route: "/formssection/formssection",
+        component: <FormsSection />,
+        noCollapse: true,
+      },
+      {
+        type: "collapse",
+        name: "LeaveTracker",
+        key: "leave-tracker",
+        icon: <Document size="12px" />,
+         route: "/leavetracker/components/leavesummary",
+         component: <LeaveSummary />,
+         noCollapse: true,
+      },
+      {
+        type: "collapse",
+        name: "UserData",
+        key: "user-data",
+        icon: <Document size="12px" />,
+        route: "/userdata/userdata",
+        component: <UserData />,
+        noCollapse: true,
+      },
+      {
+        type: "collapse",
+        name: "RejectedUserData",
+        key: "rejected-user-data",
+        icon: <Document size="12px" />,
+        route: "/RejectedUserData/RejectedUserData",
+        component: <RejectedUserData />,
+        noCollapse: true,
+      },
+      {
+        type: "route",
+        name: "UserBasicInfo",
+        key: "UserBasicInfo",
+        icon: <Document size="12px" />,
+        route: "/newuser/index",
+        component: <UserBasicInfo />,
+        noCollapse: true,
+      },
+
 /* {
         type: "collapse",
         name: "LeaveTracker",

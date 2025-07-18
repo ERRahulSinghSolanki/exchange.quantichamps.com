@@ -4,9 +4,13 @@ import React, { useEffect, useState } from "react";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import PropTypes from "prop-types";
-import { Box, Card, Grid, Slide } from "@mui/material";
+import { Box, Card, Grid, Drawer, IconButton } from "@mui/material";
 import "./dayrow.css";
 import SliderPanel from "../slider";
+import CloseIcon from "@mui/icons-material/Close"
+// import { useNavigate } from "react-router-dom"; // Importing the navigation hook
+
+// import DottedLine from "../dottedline";
 
 const statusColorMap = {
   Present: "#4CAF50",
@@ -63,12 +67,22 @@ const DayRow = ({
 
   // 🕓 Late/Early by calculation
   const shiftStartTime = "09:00";
-
+  // const navigate = useNavigate(); // For redirecting
   const handleClick = () => {
-    if (status === "Present") {
-      setIsSliderOpen(true); // Opens the slider
-    }
+    if (isFuture) return; // ⛔ Don't open slider for future rows
+    if (!isSliderOpen) setIsSliderOpen(true);
   };
+
+
+  const handleClosePanel = () => {
+    if (isSliderOpen === true)
+      setIsSliderOpen(false); // Toggle the slider state
+  }
+
+  useEffect(() => {
+    console.log(isSliderOpen + " from handleClick"); // This will log the updated value after state change
+  }, [isSliderOpen]);
+
 
   const parseTimeToDate = (timeStr) => {
     if (!timeStr || timeStr === "--") return null;
@@ -98,15 +112,6 @@ const DayRow = ({
     }
   }
 
-  // Progress width for today if Present
-  // const progressWidth =
-  //   isToday && status === "Present" && checkInDate
-  //     ? `${Math.min(
-  //         ((new Date() - checkInDate) / (9 * 60 * 60 * 1000)) * 100,
-  //         100
-  //       ).toFixed(1)}%`
-  //     : "100%";
-
   const getInitialProgress = () => {
     if (isToday && status === "Present" && checkInDate) {
       const diff = new Date() - checkInDate;
@@ -114,6 +119,7 @@ const DayRow = ({
     }
     return "100%";
   };
+
 
   const [liveProgress, setLiveProgress] = useState(getInitialProgress());
 
@@ -138,8 +144,17 @@ const DayRow = ({
   // const dayLabel = isWeekend ? "Weekend" : day;
 
   return (
-    <Card sx={{ padding: 2, marginBottom: 2, width: 1200, marginLeft: 1, position: 'relative' }}
+    <Card sx={{
+      padding: 2,
+      marginBottom: 2,
+      width: 1200,
+      marginLeft: 1,
+      position: 'relative',
+      cursor: isFuture ? "not-allowed" : "pointer",
+      opacity: isFuture ? 0.6 : 1,
+    }}
       onClick={handleClick}>
+
       {/* Centered dotted line */}
       <div style={{
         position: 'absolute',
@@ -186,7 +201,9 @@ const DayRow = ({
                   borderRadius="xl"
                   sx={{
                     backgroundColor: statusColor,
-                    width: liveProgress,
+                    // width: liveProgress,
+                    width: isToday && status === "Present" ? liveProgress : "100%",
+
                     transition: "width 0.3s ease-in-out",
                   }}
                 />
@@ -234,11 +251,38 @@ const DayRow = ({
                 {autoCheckoutMessage || hoursWorked || "--"}
               </SoftTypography>
             </Grid>
+            {/* Drawer for SliderPanel */}
+            <Drawer
+              anchor="right"
+              open={isSliderOpen}
+              // onClick={handleClosePanel} // Close when the Drawer is clicked outside
+              PaperProps={{
+                sx: {
+                  width: "50vw",
+                  maxWidth: "50vw",
+                  boxShadow: 5,
+                  borderRadius: "8px 0 0 8px",
+                  overflowY: "auto",
+                  p: 3,
+                },
+              }}
+              transitionDuration={300}
+            >
+              <Box>
+                <IconButton
+                  onClick={handleClosePanel} // Close button for the Drawer
+                  style={{ color: "gray", position: "absolute", top: "8px", right: "8px" }}
+                >
+                  <CloseIcon />
+                </IconButton>
+                <SliderPanel status={status} />
+              </Box>
+            </Drawer>
           </>
         )}
       </Grid>
-      
-      {isSliderOpen && <SliderPanel />}
+
+      {/* {isSliderOpen && <SliderPanel />} */}
 
     </Card>
 
