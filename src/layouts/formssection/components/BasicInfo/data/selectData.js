@@ -23,6 +23,14 @@ const selectData = {
       { value: "manager", label: "Manager" },
       { value: "team-leader", label: "Team Leader" },
   ],
+  department: [
+    { value: "x", label: "x" },
+    { value: "y", label: "y" },
+  ],
+  designation: [
+    { value: "a", label: "a" },
+    { value: "b", label: "b" },
+  ],
   branch: [
     { value: "Gurgaon", label: "Gurgaon" },
     { value: "Noida", label: "Noida" },

@@ -24,6 +24,7 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftSelect from "components/SoftSelect";
 import SoftInput from "components/SoftInput";
+import Icon from "@mui/material/Icon";
 import Button from "@mui/material/Button";
 import SoftTagInput from "components/SoftTagInput";
 
@@ -49,12 +50,6 @@ function BasicInfo() {
     setPfEsiStatus(option.value); 
   };
 
-  //  const passwordRequirements = [
-  //     "One special characters",
-  //     "Min 6 characters",
-  //     "One number (2 are recommended)",
-  //     "Change it often",
-  //   ];
   
 
   return (
@@ -73,84 +68,9 @@ function BasicInfo() {
           <Grid item xs={12} sm={6}>
             <FormField type="date" label="DOB" placeholder="Date of Birth" />
           </Grid>
-          {/* <Grid item xs={12}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={4}>
-                <SoftBox
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="flex-end"
-                  height="100%"
-                >
-                  <SoftBox mb={1} ml={0.5} lineHeight={0} display="inline-block">
-                    <SoftTypography
-                      component="label"
-                      variant="caption"
-                      fontWeight="bold"
-                      textTransform="capitalize"
-                    >
-                      Gender
-                    </SoftTypography>
-                  </SoftBox>
-                  <SoftSelect placeholder="Male" options={selectData.gender} />
-                </SoftBox>
-              </Grid>
-              <Grid item xs={12} sm={8}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={5}>
-                    <SoftBox
-                      display="flex"
-                      flexDirection="column"
-                      justifyContent="flex-end"
-                      height="100%"
-                    >
-                      <SoftBox mb={1} ml={0.5} lineHeight={0} display="inline-block">
-                        <SoftTypography
-                          component="label"
-                          variant="caption"
-                          fontWeight="bold"
-                          textTransform="capitalize"
-                        >
-                          birth date
-                        </SoftTypography>
-                      </SoftBox>
-                      <SoftSelect placeholder="February" options={selectData.birthDate} />
-                    </SoftBox>
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <SoftBox
-                      display="flex"
-                      flexDirection="column"
-                      justifyContent="flex-end"
-                      height="100%"
-                    >
-                      <SoftSelect placeholder={1} options={selectData.days} />
-                    </SoftBox>
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <SoftBox
-                      display="flex"
-                      flexDirection="column"
-                      justifyContent="flex-end"
-                      height="100%"
-                    >
-                      <SoftSelect placeholder={2021} options={selectData.years} />
-                    </SoftBox>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid> */}
           <Grid item xs={12} sm={6}>
             <FormField
               label="email"
-              placeholder="example@email.com"
-              inputProps={{ type: "email" }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormField
-              label="confirmation email"
               placeholder="example@email.com"
               inputProps={{ type: "email" }}
             />
@@ -191,9 +111,26 @@ function BasicInfo() {
                     </SoftTypography>
             <SoftSelect placeholder="Select" options={selectData.employementStatus} />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormField label="Department" placeholder="HR" />
-          </Grid>
+          <Grid item xs={12} md={6}> 
+          <SoftTypography
+                      component="label"
+                      variant="caption"
+                      fontWeight="bold"
+                      textTransform="capitalize"
+                    >Department
+                    </SoftTypography>
+            <SoftSelect placeholder="Select" options={selectData.department} />
+            </Grid>
+            <Grid item xs={12} md={6}>
+          <SoftTypography
+                      component="label"
+                      variant="caption"
+                      fontWeight="bold"
+                      textTransform="capitalize"
+                    >Designation
+                    </SoftTypography>
+            <SoftSelect placeholder="Select" options={selectData.designation} />
+            </Grid>
           <Grid item xs={12} sm={6}>
             <FormField label="Work Experience" placeholder="Year/Months" />
           </Grid>
@@ -319,49 +256,6 @@ function BasicInfo() {
                     >Upload your CV
                     </SoftTypography>
           <UploadButton />
-          {/* <ChangePassword /> */}
-          {/* <SoftBox mt={3} mb={1}>
-        <SoftTypography variant="h5">Change Password</SoftTypography>
-      </SoftBox>
-      <SoftBox component="form" pb={3} >
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <FormField
-              label="current password"
-              placeholder="Current Password"
-              inputProps={{ type: "password", autoComplete: "" }}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <FormField
-              label="new password"
-              placeholder="New Password"
-              inputProps={{ type: "password", autoComplete: "" }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormField
-              label="confirm new password"
-              placeholder="Confirm Password"
-              inputProps={{ type: "password", autoComplete: "" }}
-            />
-          </Grid>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-        <SoftBox
-          display="flex"
-          justifyContent="space-between"
-          alignItems="flex-end"
-          flexWrap="wrap"
-        >
-          <SoftBox mt={2}>
-            <SoftButton variant="gradient" color="dark" size="small">
-              update password
-            </SoftButton>
-          </SoftBox>
-        </SoftBox>
-        </Grid>
-      </SoftBox> */}
           </Grid>
         </Grid>
       </SoftBox>
