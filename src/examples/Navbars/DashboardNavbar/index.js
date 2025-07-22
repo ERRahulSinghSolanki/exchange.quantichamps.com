@@ -43,9 +43,6 @@ import useBreakManager from "context/BreakContext";
 import BreakModal from "layouts/break/BreakModal";
 
 function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
-  /* ──────────────────────────────────────
-     LOCAL STATE
-     ────────────────────────────────────── */
   const [navbarType, setNavbarType] = useState();
   const [openMenu, setOpenMenu] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -54,9 +51,6 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
   const [shiftEndTime, setShiftEndTime] = useState(null);
   const [logoutTimer, setLogoutTimer] = useState(null);
 
-  /* ──────────────────────────────────────
-     GLOBAL CONTEXTS
-     ────────────────────────────────────── */
   const [controller, dispatch] = useSoftUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator } = controller;
 
@@ -65,9 +59,6 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
   const location = useLocation();
   const route = location.pathname.split("/").slice(1);
 
-  /* ──────────────────────────────────────
-     BREAK CONTEXT
-     ────────────────────────────────────── */
   const {
     onBreak,
     timer,
@@ -79,10 +70,6 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
     checkActiveBreak,
   } = useBreakManager();
 
-  /* ──────────────────────────────────────
-     EFFECTS
-     ────────────────────────────────────── */
-  // navbar transparency & type
   useEffect(() => {
     setNavbarType(fixedNavbar ? "sticky" : "static");
     const handleTransparentNavbar = () => {
@@ -93,18 +80,16 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
     return () => window.removeEventListener("scroll", handleTransparentNavbar);
   }, [dispatch, fixedNavbar]);
 
-  // check if a break is already running (on page refresh)
   useEffect(() => {
     checkActiveBreak();
   }, []);
 
-  // Get user name and shift end time from localStorage
   useEffect(() => {
     const name = localStorage.getItem("name");
     if (name) {
       setUserName(name);
     }
-    
+
     const fetchShiftEndTime = async () => {
       try {
         const token = localStorage.getItem("authToken");
@@ -118,34 +103,31 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
         console.error("Failed to fetch shift end time", err);
       }
     };
-    
+
     fetchShiftEndTime();
   }, []);
 
-  // Auto logout 15 minutes after shift end time for normal users
   useEffect(() => {
-    if (!shiftEndTime || ["Admin", "Manager"].includes(localStorage.getItem("role") || !isLoggedIn)) {
-      return;
-    }
+    if (!shiftEndTime || !isLoggedIn) return;
 
-    const checkAutoLogout = () => {
-      const now = new Date();
-      const shiftEndPlus15 = new Date(shiftEndTime.getTime() + 15 * 60000); // 15 minutes after shift end
+    const userRole = localStorage.getItem("role");
+    if (["Admin", "Manager"].includes(userRole)) return;
 
-      if (now > shiftEndPlus15) {
-        // Time to auto logout
+    const now = new Date();
+    const shiftEndPlus15 = new Date(shiftEndTime.getTime() + 15 * 60000);
+
+    const remainingTime = shiftEndPlus15 - now;
+
+    if (remainingTime <= 0) {
+      console.log("⏰ Auto-logout now: Shift + 15 min passed");
+      handleAutoLogout();
+    } else {
+      const timer = setTimeout(() => {
+        console.log("⏰ Auto-logout triggered after 15 min grace");
         handleAutoLogout();
-      } else {
-        // Set timer for remaining time
-        const remainingTime = shiftEndPlus15 - now;
-        const timer = setTimeout(() => {
-          handleAutoLogout();
-        }, remainingTime);
-        setLogoutTimer(timer);
-      }
-    };
-
-    checkAutoLogout();
+      }, remainingTime);
+      setLogoutTimer(timer);
+    }
 
     return () => {
       if (logoutTimer) {
@@ -154,15 +136,11 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
     };
   }, [shiftEndTime, isLoggedIn]);
 
-  /* ──────────────────────────────────────
-     UI HANDLERS
-     ────────────────────────────────────── */
   const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
   const handleConfigurator = () => setOpenConfigurator(dispatch, !openConfigurator);
   const handleOpenMenu = (e) => setOpenMenu(e.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
 
-  /* Break start / end */
   const handleStartBreak = async () => {
     setLoading(true);
     try {
@@ -184,9 +162,6 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
     }
   };
 
-  /* ──────────────────────────────────────
-     AUTO LOGOUT HANDLER
-     ────────────────────────────────────── */
   const handleAutoLogout = async () => {
     try {
       await authLogout();
@@ -196,9 +171,6 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
     }
   };
 
-  /* ──────────────────────────────────────
-     LOGOUT LOGIC
-     ────────────────────────────────────── */
   const userRole = localStorage.getItem("role") || "";
 
   const handleLogout = async () => {
@@ -213,20 +185,17 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
       const now = new Date();
       const isAdminManager = ["Admin", "Manager"].includes(userRole);
 
-      /* ── 1. Admin / Manager  ─────────────────────────── */
       if (isAdminManager) {
         await authLogout();
         navigate("/authentication/sign-in/illustration", { replace: true });
         return;
       }
 
-      /* ── 2. Normal user still within shift → auto break */
       if (now < shiftEnd) {
         await handleStartBreak();
         return;
       }
 
-      /* ── 3. Normal user after shift end  ─────────────── */
       await authLogout();
       navigate("/authentication/sign-in/illustration", { replace: true });
     } catch (err) {
@@ -238,9 +207,6 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
     }
   };
 
-  /* ──────────────────────────────────────
-     NOTIFICATION DROPDOWN
-     ────────────────────────────────────── */
   const renderMenu = () => (
     <Menu
       anchorEl={openMenu}
@@ -271,9 +237,6 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
     </Menu>
   );
 
-  /* ──────────────────────────────────────
-     RENDER
-     ────────────────────────────────────── */
   return (
     <AppBar
       position={absolute ? "absolute" : navbarType}
@@ -281,30 +244,22 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
       sx={(theme) => navbar(theme, { transparentNavbar, absolute, light })}
     >
       <Toolbar sx={(theme) => navbarContainer(theme)}>
-        {/* Left side: breadcrumbs + menu collapse */}
         <SoftBox
           color="inherit"
           mb={{ xs: 1, md: 0 }}
           sx={(theme) => navbarRow(theme, { isMini })}
         >
-          <Breadcrumbs
-            icon="home"
-            title={route[route.length - 1]}
-            route={route}
-            light={light}
-          />
+          <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
           <Icon fontSize="medium" sx={navbarDesktopMenu} onClick={handleMiniSidenav}>
             {miniSidenav ? "menu_open" : "menu"}
           </Icon>
         </SoftBox>
 
-        {/* Right side: buttons */}
         {!isMini && (
           <SoftBox sx={(theme) => navbarRow(theme, { isMini })}>
             <SoftBox color={light ? "white" : "inherit"}>
               {isLoggedIn ? (
                 <>
-                  {/* Welcome message */}
                   {userName && (
                     <SoftTypography
                       variant="button"
@@ -316,7 +271,6 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
                     </SoftTypography>
                   )}
 
-                  {/* Start Break button for non‑admin/non‑manager */}
                   {!["Admin", "Manager"].includes(userRole) && !onBreak && (
                     <IconButton
                       sx={{ ...navbarIconButton, mr: 1 }}
@@ -338,7 +292,6 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
                     </IconButton>
                   )}
 
-                  {/* Logout */}
                   <IconButton
                     sx={navbarIconButton}
                     size="small"
@@ -374,7 +327,6 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
                 </Link>
               )}
 
-              {/* Configurator / notifications / mobile menu */}
               <IconButton
                 size="small"
                 color="inherit"
@@ -410,7 +362,6 @@ function DashboardNavbar({ absolute = false, light = false, isMini = false }) {
         )}
       </Toolbar>
 
-      {/* Break Timer Modal */}
       <BreakModal
         open={onBreak}
         timer={timer}

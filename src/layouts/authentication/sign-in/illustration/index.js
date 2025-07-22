@@ -35,7 +35,9 @@ function Illustration() {
 
       const data = await response.json();
 
-      if (data.success == 1) {
+     // if (data.success == 1) {
+     if (data.success == 1 || data.status === "already_logged_in") {
+
         const currentTime = new Date().getTime();
         const expirationTime = currentTime + 12 * 60 * 60 * 1000;
 

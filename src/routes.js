@@ -24,9 +24,6 @@ import LeaveHistory from "layouts/leave/history";
 import MyBreaks from "layouts/breaks/my";
 import AllBreaks from "layouts/breaks/all";
 
-
-import AttendanceSummary from "./layouts/attendance/component/attendancesummary";
-
 import AddUser from "layouts/users/add";
 import UserList from "layouts/users/list";
 import EditUser from "layouts/users/edit";
@@ -40,6 +37,16 @@ import BranchList from "layouts/branch/list";
 import TrashedBranchList from "layouts/branch/trashed";
 import EditBranch from "layouts/branch/edit";
 
+import AddDepartment from "layouts/departments/add";
+import DepartmentList from "layouts/departments/list";
+import TrashedDepartmentList from "layouts/departments/trashed";
+import EditDepartment from "layouts/departments/edit";
+
+import AddDesignation from "layouts/designations/add";
+import DesignationList from "layouts/designations/list";
+import TrashedDesignationList from "layouts/designations/trashed";
+import EditDesignation from "layouts/designations/edit";
+
 import AddShift from "layouts/shifts/add";
 import ShiftList from "layouts/shifts/list";
 import TrashedShiftList from "layouts/shifts/trashed";
@@ -49,18 +56,14 @@ import IdleLogs from "layouts/idel-log";
 
 import { Navigate } from "react-router-dom";
 import Document from "examples/Icons/Document";
+import AttendanceSummary from "layouts/attendance/component/attendancesummary";
 
 import LeaveSummary from "layouts/leavetracker/components/leavesummary";
 import FormsSection from "layouts/formssection/index";
 import RejectedUserData from "layouts/RejectedUserData/index";
 import UserBasicInfo from "layouts/NewUser";
 import UserData from "layouts/userdata/index";
-
-//Imports by Monika
-/* import LeaveSummary from "layouts/leavetracker/components/leavesummary";
-import InterviewEvaluationForm from "layouts/forms/interviewevaluationform";
-import JobApplicationForm from "layouts/forms/jobapplicationform";
- */
+ 
 const routesArray = [
   {
     type: "route",
@@ -141,7 +144,7 @@ const routesArray = [
     noCollapse: true,
     permissions: ["viewStudies"],
   },
-    {
+     {
     type: "collapse",
     name: "Attendance",
     key: "attendance",
@@ -370,6 +373,82 @@ const routesArray = [
 },
 {
   type: "collapse",
+  name: "Department",
+  key: "department",
+  icon: <Document size="12px" />,
+  collapse: [
+    {
+      name: "New",
+      key: "add-department",
+      route: "/departments/add",
+      component: <AddDepartment />,
+      permissions: ["AddDepartment"],
+    },
+    {
+      name: "List",
+      key: "department-list",
+      route: "/departments",
+      component: <DepartmentList />,
+      permissions: ["viewDepartment"],
+    },
+    {
+      name: "Trashed List",
+      key: "trashed-department-list",
+      route: "/departments/trashed",
+      component: <TrashedDepartmentList />,
+      permissions: ["viewTrashedDepartment"],
+    },
+  ],
+  permissions: ["Department"],
+},
+{
+  type: "route",
+  name: "Edit Department",
+  key: "edit-department",
+  route: "/departments/edit/:id",
+  component: <EditDepartment />,
+  permissions: ["EditDepartment"],
+},
+{
+  type: "collapse",
+  name: "Designation",
+  key: "designation",
+  icon: <Document size="12px" />,
+  collapse: [
+    {
+      name: "New",
+      key: "add-designation",
+      route: "/designations/add",
+      component: <AddDesignation />,
+      permissions: ["AddDesignation"],
+    },
+    {
+      name: "List",
+      key: "designation-list",
+      route: "/designations",
+      component: <DesignationList />,
+      permissions: ["viewDesignation"],
+    },
+    {
+      name: "Trashed List",
+      key: "trashed-designation-list",
+      route: "/designations/trashed",
+      component: <TrashedDesignationList />,
+      permissions: ["viewTrashedDesignation"],
+    },
+  ],
+  permissions: ["Designation"],
+},
+{
+  type: "route",
+  name: "Edit Designation",
+  key: "edit-designation",
+  route: "/designations/edit/:id",
+  component: <EditDesignation />,
+  permissions: ["EditDesignation"],
+},
+{
+  type: "collapse",
   name: "Idle Logs",
   key: "idel-logs",
   route: "/idel-log",
@@ -378,7 +457,6 @@ const routesArray = [
   noCollapse: true,
   permissions: ["viewIdleLogs"],
 },
-
 {
         type: "collapse",
         name: "Forms Section",
@@ -388,7 +466,7 @@ const routesArray = [
         component: <FormsSection />,
         noCollapse: true,
       },
-      {
+        {
         type: "collapse",
         name: "LeaveTracker",
         key: "leave-tracker",
@@ -396,7 +474,7 @@ const routesArray = [
          route: "/leavetracker/components/leavesummary",
          component: <LeaveSummary />,
          noCollapse: true,
-      },
+      },  
       {
         type: "collapse",
         name: "UserData",
@@ -424,36 +502,8 @@ const routesArray = [
         component: <UserBasicInfo />,
         noCollapse: true,
       },
-
-/* {
-        type: "collapse",
-        name: "LeaveTracker",
-        key: "leave-tracker",
-        icon: <Document size="12px" />,
-         route: "/leavetracker/components/leavesummary",
-         component: <LeaveSummary />,
-         noCollapse: true,
-      }, */
-/* {
-        type: "collapse",
-        name: "Forms",
-        key: "forms",
-        icon: <Document size="12px" />,
-        collapse: [
-          {
-            name: "Interview Evaluation Form",
-            key: "interview-evaluation-form",
-            route: "/forms/interviewevaluationform",
-            component: <InterviewEvaluationForm />,
-          },
-          {
-            name: "Job Application Form",
-            key: "job-application-form",
-            route: "/forms/jobapplicationform",
-            component: <JobApplicationForm />,
-          },
-        ],
-      }, */
+      
+  
 
 ];
 

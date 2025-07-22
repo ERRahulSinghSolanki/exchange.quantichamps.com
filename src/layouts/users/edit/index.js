@@ -236,7 +236,9 @@ const EditUser = () => {
 
       if (formData.password) {
         payload.password = formData.password;
+        payload.password_confirmation = formData.confirmPassword; 
       }
+
 
       await fetchWithAuth(`${API_URL}/users/${id}`, {
         method: "PUT",
